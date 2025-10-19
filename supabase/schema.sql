@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS family_members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   family_id UUID NOT NULL REFERENCES families(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+  role TEXT NOT NULL DEFAULT 'other' CHECK (role IN ('father', 'mother', 'son', 'daughter', 'other')),
+  is_admin BOOLEAN NOT NULL DEFAULT false,
   joined_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(family_id, user_id)
 );
@@ -43,7 +44,7 @@ CREATE POLICY "Admins can update families"
   USING (
     id IN (
       SELECT family_id FROM family_members
-      WHERE user_id = auth.uid() AND role = 'admin'
+      WHERE user_id = auth.uid() AND is_admin = true
     )
   );
 
@@ -54,7 +55,7 @@ CREATE POLICY "Admins can delete families"
   USING (
     id IN (
       SELECT family_id FROM family_members
-      WHERE user_id = auth.uid() AND role = 'admin'
+      WHERE user_id = auth.uid() AND is_admin = true
     )
   );
 
@@ -85,7 +86,18 @@ CREATE POLICY "Admins can add members to their families"
   WITH CHECK (
     family_id IN (
       SELECT family_id FROM family_members
-      WHERE user_id = auth.uid() AND role = 'admin'
+      WHERE user_id = auth.uid() AND is_admin = true
+    )
+  );
+
+-- Admins can update member roles
+CREATE POLICY "Admins can update members"
+  ON family_members
+  FOR UPDATE
+  USING (
+    family_id IN (
+      SELECT family_id FROM family_members
+      WHERE user_id = auth.uid() AND is_admin = true
     )
   );
 
@@ -102,7 +114,7 @@ CREATE POLICY "Admins can remove members from their families"
   USING (
     family_id IN (
       SELECT family_id FROM family_members
-      WHERE user_id = auth.uid() AND role = 'admin'
+      WHERE user_id = auth.uid() AND is_admin = true
     )
   );
 

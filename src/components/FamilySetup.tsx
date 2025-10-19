@@ -4,9 +4,12 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+type Role = 'father' | 'mother' | 'son' | 'daughter' | 'other'
+
 export default function FamilySetup({ userId }: { userId: string }) {
   const [familyName, setFamilyName] = useState('')
   const [familyId, setFamilyId] = useState('')
+  const [role, setRole] = useState<Role>('other')
   const [isCreating, setIsCreating] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,7 +37,8 @@ export default function FamilySetup({ userId }: { userId: string }) {
         .insert({
           family_id: family.id,
           user_id: userId,
-          role: 'admin',
+          role,
+          is_admin: true,
         })
 
       if (memberError) throw memberError
@@ -68,7 +72,8 @@ export default function FamilySetup({ userId }: { userId: string }) {
         .insert({
           family_id: family.id,
           user_id: userId,
-          role: 'member',
+          role,
+          is_admin: false,
         })
 
       if (memberError) throw memberError
@@ -138,6 +143,23 @@ export default function FamilySetup({ userId }: { userId: string }) {
                   placeholder="Enter family name"
                 />
               </div>
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                  Your Role
+                </label>
+                <select
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as Role)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="father">Father</option>
+                  <option value="mother">Mother</option>
+                  <option value="son">Son</option>
+                  <option value="daughter">Daughter</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
               <button
                 type="submit"
                 disabled={loading}
@@ -161,6 +183,23 @@ export default function FamilySetup({ userId }: { userId: string }) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter family ID"
                 />
+              </div>
+              <div>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                  Your Role
+                </label>
+                <select
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as Role)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="father">Father</option>
+                  <option value="mother">Mother</option>
+                  <option value="son">Son</option>
+                  <option value="daughter">Daughter</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
               <button
                 type="submit"
