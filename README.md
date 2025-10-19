@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Record Pet
 
-## Getting Started
+Next.js application with Supabase authentication and family management.
 
-First, run the development server:
+## Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Set up environment variables
+
+Copy `.env.example` to `.env.local` and fill in your Supabase credentials:
+
+```bash
+cp .env.example .env.local
+```
+
+Then edit `.env.local`:
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
+
+### 3. Set up Supabase database
+
+Run the SQL commands in `supabase/schema.sql` in your Supabase SQL Editor to create the necessary tables and Row Level Security policies.
+
+### 4. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Authentication**: Email/password authentication with Supabase Auth
+- **Protected Routes**: `/app` route protected by middleware
+- **Family Management**:
+  - Create a new family
+  - Join existing family by ID
+  - View family members
+  - Leave family
+- **Row Level Security**: Database policies ensure users can only access their own family data
 
-## Learn More
+## Deployment on Vercel
 
-To learn more about Next.js, take a look at the following resources:
+### Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Add these environment variables in your Vercel project settings:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
 
-## Deploy on Vercel
+### Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+vercel
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Or connect your repository to Vercel for automatic deployments.
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── app/          # Protected app route
+│   ├── callback/     # Auth callback handler
+│   ├── login/        # Login page
+│   └── layout.tsx
+├── components/
+│   ├── FamilySetup.tsx       # Create/join family flow
+│   └── FamilyDashboard.tsx   # Family overview
+└── lib/
+    └── supabase/
+        ├── client.ts      # Browser client
+        ├── server.ts      # Server client
+        └── middleware.ts  # Auth middleware
+```
+
+## Database Schema
+
+### families
+- `id`: UUID (primary key)
+- `name`: Text
+- `created_at`: Timestamp
+- `updated_at`: Timestamp
+
+### family_members
+- `id`: UUID (primary key)
+- `family_id`: UUID (foreign key to families)
+- `user_id`: UUID (foreign key to auth.users)
+- `role`: Text ('admin' or 'member')
+- `joined_at`: Timestamp
