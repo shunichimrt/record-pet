@@ -8,16 +8,17 @@ export const runtime = 'nodejs'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const supabase = await createClient()
 
     // Get authenticated user
     const user = await getAuthenticatedUser()
 
     // Verify user has access to this pet
-    const hasAccess = await verifyPetAccess(user.id, params.id)
+    const hasAccess = await verifyPetAccess(user.id, id)
     if (!hasAccess) {
       return NextResponse.json({ error: 'Pet not found' }, { status: 404 })
     }
@@ -31,7 +32,7 @@ export async function GET(
     const { data: pet, error: petError } = await supabase
       .from('pets')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (petError || !pet) {
@@ -42,7 +43,7 @@ export async function GET(
     let walksQuery = supabase
       .from('pet_walks')
       .select('*')
-      .eq('pet_id', params.id)
+      .eq('pet_id', id)
       .order('walked_at', { ascending: false })
 
     if (startDate) {
@@ -58,7 +59,7 @@ export async function GET(
     let mealsQuery = supabase
       .from('pet_meals')
       .select('*')
-      .eq('pet_id', params.id)
+      .eq('pet_id', id)
       .order('fed_at', { ascending: false })
 
     if (startDate) {
@@ -74,14 +75,14 @@ export async function GET(
     const { data: traits } = await supabase
       .from('pet_traits')
       .select('*')
-      .eq('pet_id', params.id)
+      .eq('pet_id', id)
       .order('created_at', { ascending: false })
 
     // Fetch meta
     const { data: metas } = await supabase
       .from('pet_meta')
       .select('*')
-      .eq('pet_id', params.id)
+      .eq('pet_id', id)
       .order('created_at', { ascending: false })
 
     // Generate PDF

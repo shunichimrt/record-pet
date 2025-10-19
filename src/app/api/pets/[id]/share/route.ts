@@ -8,16 +8,17 @@ export const runtime = 'nodejs'
 // Generate share token
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const supabase = await createClient()
 
     // Get authenticated user
     const user = await getAuthenticatedUser()
 
     // Verify user has access to this pet
-    const hasAccess = await verifyPetAccess(user.id, params.id)
+    const hasAccess = await verifyPetAccess(user.id, id)
     if (!hasAccess) {
       return NextResponse.json({ error: 'Pet not found' }, { status: 404 })
     }
@@ -37,7 +38,7 @@ export async function POST(
     const { data: shareToken, error: tokenError } = await supabase
       .from('share_tokens')
       .insert({
-        pet_id: params.id,
+        pet_id: id,
         token,
         created_by: user.id,
         expires_at: expiresAt.toISOString(),
@@ -70,16 +71,17 @@ export async function POST(
 // Get active tokens for a pet
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const supabase = await createClient()
 
     // Get authenticated user
     const user = await getAuthenticatedUser()
 
     // Verify user has access to this pet
-    const hasAccess = await verifyPetAccess(user.id, params.id)
+    const hasAccess = await verifyPetAccess(user.id, id)
     if (!hasAccess) {
       return NextResponse.json({ error: 'Pet not found' }, { status: 404 })
     }
@@ -88,7 +90,7 @@ export async function GET(
     const { data: tokens, error } = await supabase
       .from('share_tokens')
       .select('*')
-      .eq('pet_id', params.id)
+      .eq('pet_id', id)
       .eq('is_active', true)
       .gte('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false })
@@ -107,16 +109,17 @@ export async function GET(
 // Revoke token (admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const supabase = await createClient()
 
     // Get authenticated user
     const user = await getAuthenticatedUser()
 
     // Verify user is admin of the pet's family (only admins can revoke)
-    const isAdmin = await verifyPetAdminAccess(user.id, params.id)
+    const isAdmin = await verifyPetAdminAccess(user.id, id)
     if (!isAdmin) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
@@ -133,7 +136,7 @@ export async function DELETE(
       .from('share_tokens')
       .update({ is_active: false })
       .eq('id', tokenId)
-      .eq('pet_id', params.id)
+      .eq('pet_id', id)
 
     if (error) {
       return NextResponse.json({ error: 'Failed to revoke token' }, { status: 500 })

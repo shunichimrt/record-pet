@@ -6,8 +6,9 @@ import PetDetailTabs from '@/components/PetDetailTabs'
 export default async function PetDetailPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const supabase = await createClient()
 
   const {
@@ -27,7 +28,7 @@ export default async function PetDetailPage({
   const { data: pet } = await supabase
     .from('pets')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('family_id', membership.family_id)
     .single()
 

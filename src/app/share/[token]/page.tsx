@@ -5,15 +5,16 @@ import SharedPetView from '@/components/SharedPetView'
 export default async function SharePage({
   params,
 }: {
-  params: { token: string }
+  params: Promise<{ token: string }>
 }) {
+  const { token } = await params
   const supabase = await createClient()
 
   // Verify token - no authentication required
   const { data: shareToken, error: tokenError } = await supabase
     .from('share_tokens')
     .select('*, pets(*)')
-    .eq('token', params.token)
+    .eq('token', token)
     .eq('is_active', true)
     .single()
 

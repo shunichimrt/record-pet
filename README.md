@@ -35,6 +35,8 @@ Run the SQL commands in the following order in your Supabase SQL Editor:
 5. `supabase/migration_pet_activities.sql` - Creates pet_walks, pet_meals, pet_traits, and pet_meta tables
 6. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
 7. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
+8. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
+9. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
 
 ### 4. Run the development server
 

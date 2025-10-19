@@ -61,6 +61,14 @@ Go to SQL Editor in your Supabase dashboard and run the following SQL files **in
 7. **Fix share token permissions** - Copy and paste contents of `supabase/migration_fix_share_tokens_rls.sql`
    - Updates RLS policies to restrict token revocation to admins only
 
+8. **Create family function** - Copy and paste contents of `supabase/migration_create_family_function.sql`
+   - Creates PostgreSQL function to create family with admin in one transaction
+   - Fixes RLS policy issues during family creation
+
+9. **Fix share public access** - Copy and paste contents of `supabase/migration_fix_share_public_access.sql`
+   - Allows public (anonymous) access to shared pet data
+   - Required for public share links to work without authentication
+
 ### 1.4 Verify Database Setup
 
 After running all migrations, verify in the Table Editor:
