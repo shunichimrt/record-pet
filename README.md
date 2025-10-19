@@ -29,11 +29,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 Run the SQL commands in the following order in your Supabase SQL Editor:
 
 1. `supabase/schema.sql` - Creates families and family_members tables
-2. `supabase/migration_pets.sql` - Creates pets table
-3. `supabase/storage_setup.sql` - Sets up Storage bucket for pet avatars
-4. `supabase/migration_pet_activities.sql` - Creates pet_walks, pet_meals, pet_traits, and pet_meta tables
-5. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
-6. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
+2. `supabase/migration_fix_rls_recursion.sql` - **IMPORTANT: Fixes RLS infinite recursion issue**
+3. `supabase/migration_pets.sql` - Creates pets table
+4. `supabase/storage_setup.sql` - Sets up Storage bucket for pet avatars
+5. `supabase/migration_pet_activities.sql` - Creates pet_walks, pet_meals, pet_traits, and pet_meta tables
+6. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
+7. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
 
 ### 4. Run the development server
 

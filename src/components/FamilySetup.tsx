@@ -22,30 +22,28 @@ export default function FamilySetup({ userId }: { userId: string }) {
     setError(null)
 
     try {
-      // Create family
-      const { data: family, error: familyError } = await supabase
-        .from('families')
-        .insert({ name: familyName })
-        .select()
-        .single()
+      console.log('Creating family:', familyName, 'with role:', role)
 
-      if (familyError) throw familyError
+      // Use PostgreSQL function to create family and add user as admin in one transaction
+      // This avoids RLS policy issues with INSERT + SELECT
+      const { data, error } = await supabase.rpc('create_family_with_admin', {
+        family_name: familyName,
+        user_role: role,
+      })
 
-      // Add user as admin
-      const { error: memberError } = await supabase
-        .from('family_members')
-        .insert({
-          family_id: family.id,
-          user_id: userId,
-          role,
-          is_admin: true,
-        })
+      console.log('Family creation result:', { data, error })
 
-      if (memberError) throw memberError
+      if (error) {
+        console.error('Family creation error:', error)
+        throw error
+      }
 
+      console.log('Family created successfully!')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create family')
+      console.error('Full error:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create family'
+      setError(`エラー: ${errorMessage}`)
     } finally {
       setLoading(false)
     }

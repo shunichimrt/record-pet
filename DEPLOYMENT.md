@@ -35,25 +35,30 @@ Go to SQL Editor in your Supabase dashboard and run the following SQL files **in
 
 1. **Create base schema** - Copy and paste contents of `supabase/schema.sql`
    - Creates `families` and `family_members` tables
-   - Sets up RLS policies for family management
+   - Sets up initial RLS policies for family management
 
-2. **Create pets table** - Copy and paste contents of `supabase/migration_pets.sql`
+2. **Fix RLS recursion** - Copy and paste contents of `supabase/migration_fix_rls_recursion.sql`
+   - **IMPORTANT: This fixes infinite recursion in RLS policies**
+   - Creates helper function to avoid circular references
+   - Updates family and family_members policies
+
+3. **Create pets table** - Copy and paste contents of `supabase/migration_pets.sql`
    - Creates `pets` table
    - Sets up RLS policies for pet access
 
-3. **Set up storage** - Copy and paste contents of `supabase/storage_setup.sql`
+4. **Set up storage** - Copy and paste contents of `supabase/storage_setup.sql`
    - Creates `pet-avatars` public bucket
    - Sets up storage policies
 
-4. **Create activity tables** - Copy and paste contents of `supabase/migration_pet_activities.sql`
+5. **Create activity tables** - Copy and paste contents of `supabase/migration_pet_activities.sql`
    - Creates `pet_walks`, `pet_meals`, `pet_traits`, `pet_meta` tables
    - Sets up RLS policies for activity tracking
 
-5. **Create share tokens** - Copy and paste contents of `supabase/migration_share_tokens.sql`
+6. **Create share tokens** - Copy and paste contents of `supabase/migration_share_tokens.sql`
    - Creates `share_tokens` table
    - Sets up RLS policies for public sharing
 
-6. **Fix share token permissions** - Copy and paste contents of `supabase/migration_fix_share_tokens_rls.sql`
+7. **Fix share token permissions** - Copy and paste contents of `supabase/migration_fix_share_tokens_rls.sql`
    - Updates RLS policies to restrict token revocation to admins only
 
 ### 1.4 Verify Database Setup
