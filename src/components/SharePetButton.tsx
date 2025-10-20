@@ -81,14 +81,19 @@ export default function SharePetButton({
         { method: 'DELETE' }
       )
 
-      if (!response.ok) throw new Error('Failed to revoke token')
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Revoke error:', response.status, errorData)
+        throw new Error(errorData.error || 'Failed to revoke token')
+      }
 
       loadTokens()
       setQrCodeUrl('')
       setShareUrl('')
     } catch (error) {
-      alert('Failed to revoke share link')
-      console.error(error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to revoke share link'
+      alert(`エラー: ${errorMessage}`)
+      console.error('Full revoke error:', error)
     }
   }
 
