@@ -32,44 +32,110 @@ export default function PetDetailTabs({
 }) {
   const [activeTab, setActiveTab] = useState<Tab>('details')
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'details', label: 'Details' },
-    { id: 'walks', label: 'Walks' },
-    { id: 'meals', label: 'Meals' },
-    { id: 'traits', label: 'Traits' },
-    { id: 'meta', label: 'Meta' },
+  const tabs: { id: Tab; label: string; icon: string }[] = [
+    { id: 'details', label: '詳細', icon: '📝' },
+    { id: 'walks', label: '散歩', icon: '🚶' },
+    { id: 'meals', label: '食事', icon: '🍽️' },
+    { id: 'traits', label: '特徴', icon: '⭐' },
+    { id: 'meta', label: 'その他', icon: '📊' },
   ]
 
+  const getSpeciesEmoji = (species: string) => {
+    const emojiMap: { [key: string]: string } = {
+      dog: '🐕',
+      cat: '🐈',
+      bird: '🐦',
+      fish: '🐟',
+      rabbit: '🐰',
+      hamster: '🐹',
+      other: '🐾',
+    }
+    return emojiMap[species] || '🐾'
+  }
+
+  const getSpeciesJapanese = (species: string) => {
+    const japaneseMap: { [key: string]: string } = {
+      dog: '犬',
+      cat: '猫',
+      bird: '鳥',
+      fish: '魚',
+      rabbit: 'うさぎ',
+      hamster: 'ハムスター',
+      other: 'その他',
+    }
+    return japaneseMap[species] || species
+  }
+
+  const getGenderJapanese = (gender: string) => {
+    const genderMap: { [key: string]: string } = {
+      male: 'オス',
+      female: 'メス',
+      unknown: '不明',
+    }
+    return genderMap[gender] || gender
+  }
+
+  const getGenderEmoji = (gender: string) => {
+    const emojiMap: { [key: string]: string } = {
+      male: '♂️',
+      female: '♀️',
+      unknown: '❓',
+    }
+    return emojiMap[gender] || '❓'
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow">
+    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-[#E9ECEF] py-12 px-4">
+      <div className="max-w-5xl mx-auto animate-fade-in">
+        <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="p-8 border-b">
-            <div className="flex justify-between items-start mb-6">
-              <h1 className="text-2xl font-bold">{pet.name}</h1>
-              <div className="flex gap-2">
+          <div className="p-8 bg-gradient-to-br from-white to-gray-50">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+              <div className="flex items-center gap-4">
+                <span className="text-5xl">{getSpeciesEmoji(pet.species)}</span>
+                <div>
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-[#FF8E53] to-[#FF6B6B] bg-clip-text text-transparent">
+                    {pet.name}
+                  </h1>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="bg-gray-100 px-3 py-1 rounded-full text-sm font-medium text-gray-700">
+                      {getSpeciesJapanese(pet.species)}
+                    </span>
+                    {pet.breed && (
+                      <span className="bg-gray-100 px-3 py-1 rounded-full text-sm font-medium text-gray-700">
+                        {pet.breed}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
                 <Link
                   href={`/app/pets/${pet.id}/edit`}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+                  className="flex-1 sm:flex-none bg-gray-700 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-gray-800 transition-all text-sm flex items-center justify-center gap-2"
                 >
-                  Edit
+                  <span>✏️</span>
+                  編集
                 </Link>
                 <DeletePetButton petId={pet.id} isAdmin={isAdmin} />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
-                {pet.avatar_url && (
+                {pet.avatar_url ? (
                   <img
                     src={pet.avatar_url}
                     alt={pet.name}
-                    className="w-full max-h-64 object-cover rounded-lg"
+                    className="w-full max-h-80 object-cover rounded-2xl shadow-lg border-2 border-gray-100"
                   />
+                ) : (
+                  <div className="w-full h-80 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
+                    <span className="text-9xl">{getSpeciesEmoji(pet.species)}</span>
+                  </div>
                 )}
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <DownloadPdfButton petId={pet.id} petName={pet.name} />
                 <SharePetButton petId={pet.id} isAdmin={isAdmin} />
               </div>
@@ -77,19 +143,22 @@ export default function PetDetailTabs({
           </div>
 
           {/* Tabs */}
-          <div className="border-b">
-            <nav className="flex -mb-px">
+          <div className="border-b border-gray-200">
+            <nav className="flex overflow-x-auto">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
+                  className={`flex-shrink-0 px-6 py-4 font-semibold text-sm border-b-2 transition-all ${
                     activeTab === tab.id
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-[#FF8E53] text-[#FF8E53] bg-[#FF8E53]/5'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  {tab.label}
+                  <span className="flex items-center gap-2">
+                    <span className="text-lg">{tab.icon}</span>
+                    {tab.label}
+                  </span>
                 </button>
               ))}
             </nav>
@@ -98,49 +167,58 @@ export default function PetDetailTabs({
           {/* Tab Content */}
           <div className="p-8">
             {activeTab === 'details' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Species
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div className="bg-gradient-to-br from-blue-50 to-white p-5 rounded-2xl border border-blue-100">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                    <span>{getSpeciesEmoji(pet.species)}</span>
+                    種類
                   </label>
-                  <p className="mt-1 text-gray-900 capitalize">{pet.species}</p>
+                  <p className="text-gray-900 font-medium">{getSpeciesJapanese(pet.species)}</p>
                 </div>
 
                 {pet.breed && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Breed
+                  <div className="bg-gradient-to-br from-purple-50 to-white p-5 rounded-2xl border border-purple-100">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                      <span>📝</span>
+                      品種
                     </label>
-                    <p className="mt-1 text-gray-900">{pet.breed}</p>
+                    <p className="text-gray-900 font-medium">{pet.breed}</p>
                   </div>
                 )}
 
                 {pet.birth_date && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Birth Date
+                  <div className="bg-gradient-to-br from-pink-50 to-white p-5 rounded-2xl border border-pink-100">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                      <span>🎂</span>
+                      誕生日
                     </label>
-                    <p className="mt-1 text-gray-900">
-                      {new Date(pet.birth_date).toLocaleDateString()}
+                    <p className="text-gray-900 font-medium">
+                      {new Date(pet.birth_date).toLocaleDateString('ja-JP', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
                     </p>
                   </div>
                 )}
 
                 {pet.gender && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Gender
+                  <div className="bg-gradient-to-br from-green-50 to-white p-5 rounded-2xl border border-green-100">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                      <span>{getGenderEmoji(pet.gender)}</span>
+                      性別
                     </label>
-                    <p className="mt-1 text-gray-900 capitalize">{pet.gender}</p>
+                    <p className="text-gray-900 font-medium">{getGenderJapanese(pet.gender)}</p>
                   </div>
                 )}
 
                 {pet.notes && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Notes
+                  <div className="sm:col-span-2 bg-gradient-to-br from-yellow-50 to-white p-5 rounded-2xl border border-yellow-100">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                      <span>📋</span>
+                      メモ
                     </label>
-                    <p className="mt-1 text-gray-900 whitespace-pre-wrap">
+                    <p className="text-gray-900 whitespace-pre-wrap leading-relaxed">
                       {pet.notes}
                     </p>
                   </div>
@@ -155,9 +233,13 @@ export default function PetDetailTabs({
           </div>
 
           {/* Footer */}
-          <div className="p-8 pt-6 border-t">
-            <Link href="/app/pets" className="text-blue-600 hover:text-blue-700">
-              ← Back to Pets
+          <div className="p-8 pt-6 border-t border-gray-100">
+            <Link
+              href="/app/pets"
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 font-medium hover:bg-gray-50 px-4 py-2 rounded-xl transition-all"
+            >
+              <span>←</span>
+              ペット一覧へ戻る
             </Link>
           </div>
         </div>

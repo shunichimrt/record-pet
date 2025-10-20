@@ -46,21 +46,35 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <div>
-          <h2 className="text-3xl font-bold text-center">
-            {isSignUp ? 'サインアップ' : 'サインイン'}
+    <div className="min-h-screen flex items-center justify-center gradient-secondary relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-10">
+        <div className="absolute top-20 left-20 text-9xl">🐾</div>
+        <div className="absolute bottom-20 right-20 text-9xl">🐾</div>
+        <div className="absolute top-1/2 left-1/3 text-6xl">🐕</div>
+        <div className="absolute top-1/3 right-1/4 text-6xl">🐈</div>
+      </div>
+
+      <div className="max-w-md w-full space-y-8 p-10 glass-effect rounded-2xl shadow-xl relative z-10 m-4 animate-fade-in">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🐾</div>
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-[#FF8E53] to-[#FF6B6B] bg-clip-text text-transparent mb-2">
+            Record Pet
           </h2>
+          <p className="text-gray-600 text-sm">
+            {isSignUp ? 'ペットの記録を始めましょう' : 'ペットの記録にアクセス'}
+          </p>
         </div>
+
         <form className="space-y-6" onSubmit={handleAuth}>
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm animate-slide-in">
               {error}
             </div>
           )}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+
+          <div className="space-y-1">
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
               メールアドレス
             </label>
             <input
@@ -69,11 +83,13 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
+              placeholder="your@email.com"
             />
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+
+          <div className="space-y-1">
+            <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
               パスワード
             </label>
             <input
@@ -82,26 +98,39 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
+              placeholder="••••••••"
             />
           </div>
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full flex justify-center items-center gap-2 py-3 px-4 gradient-primary text-white rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? '読み込み中...' : isSignUp ? 'サインアップ' : 'サインイン'}
+            {loading ? (
+              <>
+                <span className="animate-spin">⏳</span>
+                読み込み中...
+              </>
+            ) : (
+              <>
+                <span>{isSignUp ? '🎉' : '🔐'}</span>
+                {isSignUp ? 'サインアップ' : 'サインイン'}
+              </>
+            )}
           </button>
         </form>
-        <div className="text-center">
+
+        <div className="text-center pt-4 border-t border-gray-200">
           <button
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
-            className="text-sm text-blue-600 hover:text-blue-500"
+            className="text-sm font-medium bg-gradient-to-r from-[#FF8E53] to-[#FF6B6B] bg-clip-text text-transparent hover:opacity-80 transition-opacity"
           >
             {isSignUp
-              ? 'すでにアカウントを持っていますか？サインイン'
-              : "アカウントを持っていませんか？サインアップ"}
+              ? 'すでにアカウントを持っていますか？ サインイン →'
+              : "アカウントを持っていませんか？ サインアップ →"}
           </button>
         </div>
       </div>

@@ -87,109 +87,133 @@ export default function PetTraits({ petId }: { petId: string }) {
       {!showForm && (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          className="w-full gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
         >
-          Add Trait
+          <span>✨</span>
+          特徴を追加
         </button>
       )}
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded-lg space-y-4">
+        <form onSubmit={handleSubmit} className="bg-gradient-to-br from-purple-50 to-white p-6 rounded-2xl border border-purple-100 space-y-5 animate-fade-in">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl">⭐</span>
+            <h3 className="font-bold text-gray-800">{editingId ? '特徴を編集' : '特徴を記録'}</h3>
+          </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Trait Name *
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>🏷️</span>
+              特徴の名前 *
             </label>
             <input
               type="text"
               required
               value={traitName}
               onChange={(e) => setTraitName(e.target.value)}
-              placeholder="e.g., Favorite toy, Fear, Habit"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="例: 好きなおもちゃ"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Trait Value *
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>💬</span>
+              値 *
             </label>
             <input
               type="text"
               required
               value={traitValue}
               onChange={(e) => setTraitValue(e.target.value)}
-              placeholder="e.g., Tennis ball, Thunderstorms, Early riser"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="例: テニスボール"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>📋</span>
+              メモ
             </label>
             <textarea
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all resize-none"
+              placeholder="詳細をメモ"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3 pt-2">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+              className="flex-1 gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
             >
-              {editingId ? 'Update' : 'Save'}
+              <span>{editingId ? '✏️' : '💾'}</span>
+              {editingId ? '更新' : '保存'}
             </button>
             <button
               type="button"
               onClick={resetForm}
-              className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300"
+              className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
             >
-              Cancel
+              <span>✕</span>
+              キャンセル
             </button>
           </div>
         </form>
       )}
 
       {/* List */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {loading ? (
-          <p className="text-gray-500 text-center py-4">Loading...</p>
+          <div className="text-center py-12">
+            <span className="text-4xl animate-spin inline-block">⏳</span>
+            <p className="text-gray-500 mt-3">読み込み中...</p>
+          </div>
         ) : traits.length > 0 ? (
-          traits.map((trait) => (
+          traits.map((trait, index) => (
             <div
               key={trait.id}
-              className="p-4 border rounded-lg hover:bg-gray-50"
+              className="p-5 bg-gradient-to-r from-white to-purple-50 border border-purple-100 rounded-2xl hover:shadow-md transition-all animate-fade-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col sm:flex-row justify-between gap-3">
                 <div className="flex-1">
-                  <div className="font-medium">{trait.trait_name}</div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="flex items-center gap-2 font-bold text-gray-800 mb-2">
+                    <span className="text-xl">⭐</span>
+                    <span>{trait.trait_name}</span>
+                  </div>
+                  <div className="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl inline-block font-medium">
                     {trait.trait_value}
                   </div>
                   {trait.notes && (
-                    <p className="text-sm text-gray-700 mt-2">{trait.notes}</p>
+                    <p className="text-sm text-gray-700 mt-3 p-3 bg-gray-50 rounded-xl leading-relaxed">
+                      {trait.notes}
+                    </p>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex sm:flex-col gap-2">
                   <button
                     onClick={() => handleEdit(trait)}
-                    className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                    className="flex-1 sm:flex-none text-xs px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-all"
                   >
-                    Edit
+                    編集
                   </button>
                   <button
                     onClick={() => handleDelete(trait.id)}
-                    className="text-xs px-3 py-1 bg-red-100 text-red-600 hover:bg-red-200 rounded"
+                    className="flex-1 sm:flex-none text-xs px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold transition-all"
                   >
-                    Delete
+                    削除
                   </button>
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-gray-500 text-center py-4">No traits recorded</p>
+          <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100">
+            <div className="text-5xl mb-3">⭐</div>
+            <p className="text-gray-500">まだ特徴の記録がありません</p>
+          </div>
         )}
       </div>
     </div>

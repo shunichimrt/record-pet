@@ -26,64 +26,133 @@ export default async function PetsPage() {
     .eq('family_id', membership.family_id)
     .order('created_at', { ascending: false })
 
+  const getSpeciesEmoji = (species: string) => {
+    const emojiMap: { [key: string]: string } = {
+      dog: '🐕',
+      cat: '🐈',
+      bird: '🐦',
+      fish: '🐟',
+      rabbit: '🐰',
+      hamster: '🐹',
+      other: '🐾',
+    }
+    return emojiMap[species] || '🐾'
+  }
+
+  const getSpeciesJapanese = (species: string) => {
+    const japaneseMap: { [key: string]: string } = {
+      dog: '犬',
+      cat: '猫',
+      bird: '鳥',
+      fish: '魚',
+      rabbit: 'うさぎ',
+      hamster: 'ハムスター',
+      other: 'その他',
+    }
+    return japaneseMap[species] || species
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Pets</h1>
-            <div className="flex gap-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-[#E9ECEF] py-12 px-4">
+      <div className="max-w-6xl mx-auto animate-fade-in">
+        <div className="bg-white rounded-3xl shadow-xl p-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-4xl">🐾</span>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-[#FF8E53] to-[#FF6B6B] bg-clip-text text-transparent">
+                  ペット一覧
+                </h1>
+              </div>
+              <p className="text-gray-600 text-sm ml-14">
+                {pets && pets.length > 0
+                  ? `${pets.length}匹のペット`
+                  : 'ペットを追加して記録を始めましょう'}
+              </p>
+            </div>
+            <div className="flex gap-3 w-full sm:w-auto">
               <Link
                 href="/app/pets/new"
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                className="flex-1 sm:flex-none gradient-primary text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
               >
-                Add Pet
+                <span>✨</span>
+                ペット追加
               </Link>
               <Link
                 href="/app"
-                className="text-sm text-gray-600 hover:text-gray-800 px-4 py-2"
+                className="flex-1 sm:flex-none bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
               >
-                Back to Family
+                <span>🏠</span>
+                家族へ戻る
               </Link>
             </div>
           </div>
 
           {pets && pets.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {pets.map((pet) => (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {pets.map((pet, index) => (
                 <Link
                   key={pet.id}
                   href={`/app/pets/${pet.id}`}
-                  className="block p-4 border rounded-lg hover:shadow-md transition-shadow"
+                  className="group block bg-gradient-to-br from-white to-gray-50 p-5 border border-gray-100 rounded-2xl hover:shadow-xl transition-all transform hover:-translate-y-1 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  {pet.avatar_url && (
-                    <img
-                      src={pet.avatar_url}
-                      alt={pet.name}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
+                  {pet.avatar_url ? (
+                    <div className="relative overflow-hidden rounded-xl mb-4">
+                      <img
+                        src={pet.avatar_url}
+                        alt={pet.name}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-2xl">
+                        {getSpeciesEmoji(pet.species)}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl mb-4">
+                      <span className="text-6xl">{getSpeciesEmoji(pet.species)}</span>
+                    </div>
                   )}
-                  <h3 className="font-semibold text-lg">{pet.name}</h3>
-                  <p className="text-sm text-gray-600 capitalize">
-                    {pet.species}
-                    {pet.breed && ` - ${pet.breed}`}
-                  </p>
-                  {pet.birth_date && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      Born: {new Date(pet.birth_date).toLocaleDateString()}
-                    </p>
-                  )}
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-xl text-gray-800 flex items-center gap-2">
+                      <span>{pet.name}</span>
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <span className="bg-gray-100 px-3 py-1 rounded-full font-medium">
+                        {getSpeciesJapanese(pet.species)}
+                      </span>
+                      {pet.breed && (
+                        <span className="bg-gray-100 px-3 py-1 rounded-full font-medium">
+                          {pet.breed}
+                        </span>
+                      )}
+                    </div>
+                    {pet.birth_date && (
+                      <div className="flex items-center gap-2 text-xs text-gray-500 pt-2">
+                        <span>🎂</span>
+                        <span>
+                          {new Date(pet.birth_date).toLocaleDateString('ja-JP', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">No pets yet</p>
+            <div className="text-center py-16 animate-fade-in">
+              <div className="text-7xl mb-4">🐾</div>
+              <p className="text-gray-500 text-lg mb-6">まだペットが登録されていません</p>
               <Link
                 href="/app/pets/new"
-                className="text-blue-600 hover:text-blue-700"
+                className="inline-flex items-center gap-2 gradient-primary text-white px-8 py-4 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
               >
-                Add your first pet
+                <span>✨</span>
+                最初のペットを追加
               </Link>
             </div>
           )}

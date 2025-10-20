@@ -91,45 +91,59 @@ export default function FamilySetup({ userId }: { userId: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
-      <div className="max-w-md mx-auto">
-        <div className="bg-white rounded-lg shadow p-8">
-          <h1 className="text-2xl font-bold mb-6 text-center">Family Setup</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-[#E9ECEF] py-12 px-4">
+      <div className="max-w-lg mx-auto animate-fade-in">
+        <div className="bg-white rounded-3xl shadow-xl p-8 md:p-10">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#FF8E53] to-[#FF6B6B] bg-clip-text text-transparent mb-2">
+              家族を設定
+            </h1>
+            <p className="text-gray-600 text-sm">
+              家族を作成するか、既存の家族に参加
+            </p>
+          </div>
 
-          <div className="flex gap-2 mb-6">
+          {/* Toggle Buttons */}
+          <div className="flex gap-2 mb-6 p-1 bg-gray-100 rounded-xl">
             <button
               onClick={() => setIsCreating(true)}
-              className={`flex-1 py-2 px-4 rounded ${
+              className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
                 isCreating
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700'
+                  ? 'gradient-primary text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-200'
               }`}
             >
-              Create Family
+              <span className="mr-2">✨</span>
+              家族を作成
             </button>
             <button
               onClick={() => setIsCreating(false)}
-              className={`flex-1 py-2 px-4 rounded ${
+              className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
                 !isCreating
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700'
+                  ? 'gradient-primary text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-200'
               }`}
             >
-              Join Family
+              <span className="mr-2">🔗</span>
+              家族に参加
             </button>
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded text-sm mb-4">
-              {error}
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm mb-6 flex items-center gap-2 animate-slide-in">
+              <span>⚠️</span>
+              <span>{error}</span>
             </div>
           )}
 
           {isCreating ? (
-            <form onSubmit={handleCreateFamily} className="space-y-4">
+            <form onSubmit={handleCreateFamily} className="space-y-6">
               <div>
-                <label htmlFor="familyName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Family Name
+                <label htmlFor="familyName" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <span>👨‍👩‍👧‍👦</span>
+                  家族の名前
                 </label>
                 <input
                   id="familyName"
@@ -137,39 +151,51 @@ export default function FamilySetup({ userId }: { userId: string }) {
                   required
                   value={familyName}
                   onChange={(e) => setFamilyName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter family name"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
+                  placeholder="例: 村田家"
                 />
               </div>
               <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Role
+                <label htmlFor="role" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <span>👤</span>
+                  あなたの役割
                 </label>
                 <select
                   id="role"
                   value={role}
                   onChange={(e) => setRole(e.target.value as Role)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
                 >
-                  <option value="father">Father</option>
-                  <option value="mother">Mother</option>
-                  <option value="son">Son</option>
-                  <option value="daughter">Daughter</option>
-                  <option value="other">Other</option>
+                  <option value="father">👨 父親</option>
+                  <option value="mother">👩 母親</option>
+                  <option value="son">👦 息子</option>
+                  <option value="daughter">👧 娘</option>
+                  <option value="other">👤 その他</option>
                 </select>
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="w-full gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {loading ? 'Creating...' : 'Create Family'}
+                {loading ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    作成中...
+                  </>
+                ) : (
+                  <>
+                    <span>✨</span>
+                    家族を作成
+                  </>
+                )}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleJoinFamily} className="space-y-4">
+            <form onSubmit={handleJoinFamily} className="space-y-6">
               <div>
-                <label htmlFor="familyId" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="familyId" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <span>🔑</span>
                   Family ID
                 </label>
                 <input
@@ -178,43 +204,55 @@ export default function FamilySetup({ userId }: { userId: string }) {
                   required
                   value={familyId}
                   onChange={(e) => setFamilyId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter family ID"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all font-mono text-sm"
+                  placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 />
               </div>
               <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Role
+                <label htmlFor="joinRole" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <span>👤</span>
+                  あなたの役割
                 </label>
                 <select
-                  id="role"
+                  id="joinRole"
                   value={role}
                   onChange={(e) => setRole(e.target.value as Role)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
                 >
-                  <option value="father">Father</option>
-                  <option value="mother">Mother</option>
-                  <option value="son">Son</option>
-                  <option value="daughter">Daughter</option>
-                  <option value="other">Other</option>
+                  <option value="father">👨 父親</option>
+                  <option value="mother">👩 母親</option>
+                  <option value="son">👦 息子</option>
+                  <option value="daughter">👧 娘</option>
+                  <option value="other">👤 その他</option>
                 </select>
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="w-full gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {loading ? 'Joining...' : 'Join Family'}
+                {loading ? (
+                  <>
+                    <span className="animate-spin">⏳</span>
+                    参加中...
+                  </>
+                ) : (
+                  <>
+                    <span>🔗</span>
+                    家族に参加
+                  </>
+                )}
               </button>
             </form>
           )}
 
-          <div className="mt-6 pt-6 border-t">
+          <div className="mt-8 pt-6 border-t border-gray-100">
             <button
               onClick={handleSignOut}
-              className="w-full text-sm text-gray-600 hover:text-gray-800"
+              className="w-full text-sm text-gray-600 hover:text-gray-800 font-medium hover:bg-gray-50 px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-2"
             >
-              Sign Out
+              <span>👋</span>
+              サインアウト
             </button>
           </div>
         </div>

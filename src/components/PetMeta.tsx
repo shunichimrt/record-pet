@@ -79,11 +79,14 @@ export default function PetMeta({ petId }: { petId: string }) {
   return (
     <div className="space-y-6">
       {/* Description */}
-      <div className="bg-blue-50 p-4 rounded-lg">
-        <p className="text-sm text-gray-700">
-          Custom fields allow you to track any additional information about your pet
-          that doesn't fit in other categories. Examples: Microchip ID, Insurance
-          Policy Number, Vet Contact, etc.
+      <div className="bg-gradient-to-br from-blue-50 to-white p-5 rounded-2xl border border-blue-100">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xl">💡</span>
+          <h3 className="font-bold text-gray-800">カスタムフィールドについて</h3>
+        </div>
+        <p className="text-sm text-gray-700 leading-relaxed">
+          カスタムフィールドを使用すると、他のカテゴリに当てはまらないペットに関する追加情報を記録できます。
+          例: マイクロチップID、保険証券番号、獣医の連絡先など
         </p>
       </div>
 
@@ -91,86 +94,106 @@ export default function PetMeta({ petId }: { petId: string }) {
       {!showForm && (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          className="w-full gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
         >
-          Add Custom Field
+          <span>✨</span>
+          フィールドを追加
         </button>
       )}
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded-lg space-y-4">
+        <form onSubmit={handleSubmit} className="bg-gradient-to-br from-cyan-50 to-white p-6 rounded-2xl border border-cyan-100 space-y-5 animate-fade-in">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl">📊</span>
+            <h3 className="font-bold text-gray-800">{editingId ? 'フィールドを編集' : 'フィールドを追加'}</h3>
+          </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Field Name *
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>🏷️</span>
+              フィールド名 *
             </label>
             <input
               type="text"
               required
               value={metaKey}
               onChange={(e) => setMetaKey(e.target.value)}
-              placeholder="e.g., Microchip ID, Vet Phone"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="例: マイクロチップID"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Field Value *
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>💬</span>
+              値 *
             </label>
             <input
               type="text"
               required
               value={metaValue}
               onChange={(e) => setMetaValue(e.target.value)}
-              placeholder="e.g., 123456789, (555) 123-4567"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="例: 123456789"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3 pt-2">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+              className="flex-1 gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
             >
-              {editingId ? 'Update' : 'Save'}
+              <span>{editingId ? '✏️' : '💾'}</span>
+              {editingId ? '更新' : '保存'}
             </button>
             <button
               type="button"
               onClick={resetForm}
-              className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300"
+              className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
             >
-              Cancel
+              <span>✕</span>
+              キャンセル
             </button>
           </div>
         </form>
       )}
 
       {/* List */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {loading ? (
-          <p className="text-gray-500 text-center py-4">Loading...</p>
+          <div className="text-center py-12">
+            <span className="text-4xl animate-spin inline-block">⏳</span>
+            <p className="text-gray-500 mt-3">読み込み中...</p>
+          </div>
         ) : metas.length > 0 ? (
-          <div className="border rounded-lg divide-y">
-            {metas.map((meta) => (
-              <div key={meta.id} className="p-4 hover:bg-gray-50">
-                <div className="flex justify-between items-center">
+          <div className="grid gap-3">
+            {metas.map((meta, index) => (
+              <div
+                key={meta.id}
+                className="p-5 bg-gradient-to-r from-white to-cyan-50 border border-cyan-100 rounded-2xl hover:shadow-md transition-all animate-fade-in"
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <div className="flex flex-col sm:flex-row justify-between gap-3">
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-700">
-                      {meta.meta_key}
+                    <div className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-1">
+                      <span>📊</span>
+                      <span>{meta.meta_key}</span>
                     </div>
-                    <div className="text-gray-900 mt-1">{meta.meta_value}</div>
+                    <div className="text-gray-900 font-medium text-lg bg-cyan-100 px-4 py-2 rounded-xl inline-block">
+                      {meta.meta_value}
+                    </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex sm:flex-col gap-2">
                     <button
                       onClick={() => handleEdit(meta)}
-                      className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                      className="flex-1 sm:flex-none text-xs px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-all"
                     >
-                      Edit
+                      編集
                     </button>
                     <button
                       onClick={() => handleDelete(meta.id)}
-                      className="text-xs px-3 py-1 bg-red-100 text-red-600 hover:bg-red-200 rounded"
+                      className="flex-1 sm:flex-none text-xs px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold transition-all"
                     >
-                      Delete
+                      削除
                     </button>
                   </div>
                 </div>
@@ -178,7 +201,10 @@ export default function PetMeta({ petId }: { petId: string }) {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 text-center py-4">No custom fields</p>
+          <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100">
+            <div className="text-5xl mb-3">📊</div>
+            <p className="text-gray-500">まだカスタムフィールドがありません</p>
+          </div>
         )}
       </div>
     </div>

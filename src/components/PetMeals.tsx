@@ -101,164 +101,211 @@ export default function PetMeals({ petId }: { petId: string }) {
   return (
     <div className="space-y-6">
       {/* Filter */}
-      <div className="flex gap-4 items-end">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Start Date
-          </label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+      <div className="bg-gradient-to-br from-orange-50 to-white p-5 rounded-2xl border border-orange-100">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xl">📅</span>
+          <h3 className="font-bold text-gray-800">期間で絞り込み</h3>
         </div>
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            End Date
-          </label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
+        <div className="flex flex-col sm:flex-row gap-3 items-end">
+          <div className="flex-1 w-full">
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>📆</span>
+              開始日
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
+            />
+          </div>
+          <div className="flex-1 w-full">
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>📆</span>
+              終了日
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
+            />
+          </div>
+          <button
+            onClick={() => {
+              setStartDate('')
+              setEndDate('')
+            }}
+            className="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:text-gray-800 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all w-full sm:w-auto"
+          >
+            クリア
+          </button>
         </div>
-        <button
-          onClick={() => {
-            setStartDate('')
-            setEndDate('')
-          }}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
-        >
-          Clear
-        </button>
       </div>
 
       {/* Add Button */}
       {!showForm && (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          className="w-full gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
         >
-          Add Meal
+          <span>✨</span>
+          食事を追加
         </button>
       )}
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded-lg space-y-4">
+        <form onSubmit={handleSubmit} className="bg-gradient-to-br from-orange-50 to-white p-6 rounded-2xl border border-orange-100 space-y-5 animate-fade-in">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl">🍽️</span>
+            <h3 className="font-bold text-gray-800">{editingId ? '食事を編集' : '食事を記録'}</h3>
+          </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date & Time *
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>🕐</span>
+              日時 *
             </label>
             <input
               type="datetime-local"
               required
               value={fedAt}
               onChange={(e) => setFedAt(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Food Type
+              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <span>🍽️</span>
+                食事の種類
               </label>
               <input
                 type="text"
                 value={foodType}
                 onChange={(e) => setFoodType(e.target.value)}
-                placeholder="e.g., Dry food, Wet food"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="例: ドライフード"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount
+              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <span>⚖️</span>
+                量
               </label>
               <input
                 type="text"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder="e.g., 100g, 1 cup"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="例: 100g"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <span>📋</span>
+              メモ
             </label>
             <textarea
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all resize-none"
+              placeholder="食事の様子をメモ"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3 pt-2">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+              className="flex-1 gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
             >
-              {editingId ? 'Update' : 'Save'}
+              <span>{editingId ? '✏️' : '💾'}</span>
+              {editingId ? '更新' : '保存'}
             </button>
             <button
               type="button"
               onClick={resetForm}
-              className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300"
+              className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
             >
-              Cancel
+              <span>✕</span>
+              キャンセル
             </button>
           </div>
         </form>
       )}
 
       {/* List */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {loading ? (
-          <p className="text-gray-500 text-center py-4">Loading...</p>
+          <div className="text-center py-12">
+            <span className="text-4xl animate-spin inline-block">⏳</span>
+            <p className="text-gray-500 mt-3">読み込み中...</p>
+          </div>
         ) : meals.length > 0 ? (
-          meals.map((meal) => (
+          meals.map((meal, index) => (
             <div
               key={meal.id}
-              className="p-4 border rounded-lg hover:bg-gray-50"
+              className="p-5 bg-gradient-to-r from-white to-gray-50 border border-gray-100 rounded-2xl hover:shadow-md transition-all animate-fade-in"
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col sm:flex-row justify-between gap-3">
                 <div className="flex-1">
-                  <div className="font-medium">
-                    {new Date(meal.fed_at).toLocaleString()}
+                  <div className="flex items-center gap-2 font-bold text-gray-800 mb-2">
+                    <span className="text-xl">🍽️</span>
+                    <span>
+                      {new Date(meal.fed_at).toLocaleDateString('ja-JP', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="flex flex-wrap gap-2 text-sm">
                     {meal.food_type && (
-                      <span className="mr-3">🍽 {meal.food_type}</span>
+                      <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                        <span>🍽️</span>
+                        {meal.food_type}
+                      </span>
                     )}
-                    {meal.amount && <span>📊 {meal.amount}</span>}
+                    {meal.amount && (
+                      <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                        <span>⚖️</span>
+                        {meal.amount}
+                      </span>
+                    )}
                   </div>
                   {meal.notes && (
-                    <p className="text-sm text-gray-700 mt-2">{meal.notes}</p>
+                    <p className="text-sm text-gray-700 mt-3 p-3 bg-gray-50 rounded-xl leading-relaxed">
+                      {meal.notes}
+                    </p>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex sm:flex-col gap-2">
                   <button
                     onClick={() => handleEdit(meal)}
-                    className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                    className="flex-1 sm:flex-none text-xs px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-all"
                   >
-                    Edit
+                    編集
                   </button>
                   <button
                     onClick={() => handleDelete(meal.id)}
-                    className="text-xs px-3 py-1 bg-red-100 text-red-600 hover:bg-red-200 rounded"
+                    className="flex-1 sm:flex-none text-xs px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold transition-all"
                   >
-                    Delete
+                    削除
                   </button>
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <p className="text-gray-500 text-center py-4">No meals recorded</p>
+          <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100">
+            <div className="text-5xl mb-3">🍽️</div>
+            <p className="text-gray-500">まだ食事の記録がありません</p>
+          </div>
         )}
       </div>
     </div>
