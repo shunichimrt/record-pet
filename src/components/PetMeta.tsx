@@ -72,7 +72,7 @@ export default function PetMeta({ petId }: { petId: string }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this field?')) return
+    if (!confirm('このフィールドを削除してもよろしいですか？')) return
     await supabase.from('pet_meta').delete().eq('id', id)
     loadMetas()
   }

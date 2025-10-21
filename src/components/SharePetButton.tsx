@@ -66,7 +66,7 @@ export default function SharePetButton({
 
       loadTokens()
     } catch (error) {
-      alert('Failed to generate share link')
+      alert('共有リンクの生成に失敗しました')
       console.error(error)
     } finally {
       setLoading(false)
@@ -74,7 +74,7 @@ export default function SharePetButton({
   }
 
   const revokeToken = async (tokenId: string) => {
-    if (!confirm('Are you sure you want to revoke this share link?')) return
+    if (!confirm('この共有リンクを無効化してもよろしいですか？')) return
 
     try {
       const response = await fetch(
@@ -100,7 +100,7 @@ export default function SharePetButton({
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareUrl)
-    alert('Link copied to clipboard!')
+    alert('リンクをクリップボードにコピーしました')
   }
 
   const downloadQR = () => {

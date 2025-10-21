@@ -94,7 +94,7 @@ export default function PetWalks({ petId }: { petId: string }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this walk?')) return
+    if (!confirm('この散歩記録を削除してもよろしいですか？')) return
     await supabase.from('pet_walks').delete().eq('id', id)
     loadWalks()
   }

@@ -69,7 +69,7 @@ export default function FamilyDashboard({
   }
 
   const handleLeaveFamily = async () => {
-    if (!confirm('Are you sure you want to leave this family?')) return
+    if (!confirm('この家族から退出してもよろしいですか？')) return
 
     const { error } = await supabase
       .from('family_members')
@@ -83,7 +83,7 @@ export default function FamilyDashboard({
   }
 
   const handleRemoveMember = async (memberId: string) => {
-    if (!confirm('Are you sure you want to remove this member?')) return
+    if (!confirm('このメンバーを削除してもよろしいですか？')) return
 
     const { error } = await supabase
       .from('family_members')
@@ -109,7 +109,7 @@ export default function FamilyDashboard({
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-gray-600">読み込み中...</div>
       </div>
     )
   }
@@ -164,7 +164,7 @@ export default function FamilyDashboard({
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <Key className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
               </div>
-              <h2 className="text-base sm:text-lg font-bold text-gray-800">Family ID</h2>
+              <h2 className="text-base sm:text-lg font-bold text-gray-800">家族ID</h2>
             </div>
             <div className="bg-white/80 backdrop-blur p-3 sm:p-4 rounded-xl font-mono text-xs sm:text-sm break-all border-2 border-dashed border-blue-200 mb-2">
               {familyId}

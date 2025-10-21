@@ -77,7 +77,7 @@ export default function PetTraits({ petId }: { petId: string }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this trait?')) return
+    if (!confirm('この特徴を削除してもよろしいですか？')) return
     await supabase.from('pet_traits').delete().eq('id', id)
     loadTraits()
   }

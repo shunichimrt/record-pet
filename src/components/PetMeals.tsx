@@ -94,7 +94,7 @@ export default function PetMeals({ petId }: { petId: string }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this meal?')) return
+    if (!confirm('この食事記録を削除してもよろしいですか？')) return
     await supabase.from('pet_meals').delete().eq('id', id)
     loadMeals()
   }
