@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
+import { Calendar, CalendarDays, Footprints, Clock, MapPin, StickyNote, Sparkles, Save, Edit, X, Loader2 } from 'lucide-react'
 
 interface Walk {
   id: string
@@ -103,13 +104,13 @@ export default function PetWalks({ petId }: { petId: string }) {
       {/* Filter */}
       <div className="bg-gradient-to-br from-blue-50 to-white p-5 rounded-2xl border border-blue-100">
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-xl">📅</span>
+          <Calendar className="w-5 h-5 text-blue-600" />
           <h3 className="font-bold text-gray-800">期間で絞り込み</h3>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 items-end">
           <div className="flex-1 w-full">
             <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <span>📆</span>
+              <CalendarDays className="w-4 h-4" />
               開始日
             </label>
             <input
@@ -121,7 +122,7 @@ export default function PetWalks({ petId }: { petId: string }) {
           </div>
           <div className="flex-1 w-full">
             <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <span>📆</span>
+              <CalendarDays className="w-4 h-4" />
               終了日
             </label>
             <input
@@ -149,7 +150,7 @@ export default function PetWalks({ petId }: { petId: string }) {
           onClick={() => setShowForm(true)}
           className="w-full gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
         >
-          <span>✨</span>
+          <Sparkles className="w-5 h-5" />
           散歩を追加
         </button>
       )}
@@ -158,13 +159,13 @@ export default function PetWalks({ petId }: { petId: string }) {
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-gradient-to-br from-green-50 to-white p-6 rounded-2xl border border-green-100 space-y-5 animate-fade-in">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">🚶</span>
+            <Footprints className="w-6 h-6 text-green-600" />
             <h3 className="font-bold text-gray-800">{editingId ? '散歩を編集' : '散歩を記録'}</h3>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <span>🕐</span>
+              <Clock className="w-4 h-4" />
               日時 *
             </label>
             <input
@@ -178,7 +179,7 @@ export default function PetWalks({ petId }: { petId: string }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <span>⏱️</span>
+                <Clock className="w-4 h-4" />
                 時間 (分)
               </label>
               <input
@@ -191,7 +192,7 @@ export default function PetWalks({ petId }: { petId: string }) {
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <span>📍</span>
+                <MapPin className="w-4 h-4" />
                 距離 (km)
               </label>
               <input
@@ -206,7 +207,7 @@ export default function PetWalks({ petId }: { petId: string }) {
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <span>📋</span>
+              <StickyNote className="w-4 h-4" />
               メモ
             </label>
             <textarea
@@ -222,7 +223,7 @@ export default function PetWalks({ petId }: { petId: string }) {
               type="submit"
               className="flex-1 gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
             >
-              <span>{editingId ? '✏️' : '💾'}</span>
+              {editingId ? <Edit className="w-5 h-5" /> : <Save className="w-5 h-5" />}
               {editingId ? '更新' : '保存'}
             </button>
             <button
@@ -230,7 +231,7 @@ export default function PetWalks({ petId }: { petId: string }) {
               onClick={resetForm}
               className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
             >
-              <span>✕</span>
+              <X className="w-5 h-5" />
               キャンセル
             </button>
           </div>
@@ -241,7 +242,7 @@ export default function PetWalks({ petId }: { petId: string }) {
       <div className="space-y-3">
         {loading ? (
           <div className="text-center py-12">
-            <span className="text-4xl animate-spin inline-block">⏳</span>
+            <Loader2 className="w-10 h-10 animate-spin text-gray-400 mx-auto" />
             <p className="text-gray-500 mt-3">読み込み中...</p>
           </div>
         ) : walks.length > 0 ? (
@@ -254,7 +255,7 @@ export default function PetWalks({ petId }: { petId: string }) {
               <div className="flex flex-col sm:flex-row justify-between gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 font-bold text-gray-800 mb-2">
-                    <span className="text-xl">🚶</span>
+                    <Footprints className="w-5 h-5" />
                     <span>
                       {new Date(walk.walked_at).toLocaleDateString('ja-JP', {
                         year: 'numeric',
@@ -268,13 +269,13 @@ export default function PetWalks({ petId }: { petId: string }) {
                   <div className="flex flex-wrap gap-2 text-sm">
                     {walk.duration_minutes && (
                       <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium flex items-center gap-1">
-                        <span>⏱️</span>
+                        <Clock className="w-3.5 h-3.5" />
                         {walk.duration_minutes}分
                       </span>
                     )}
                     {walk.distance_km && (
                       <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium flex items-center gap-1">
-                        <span>📍</span>
+                        <MapPin className="w-3.5 h-3.5" />
                         {walk.distance_km}km
                       </span>
                     )}
@@ -304,7 +305,7 @@ export default function PetWalks({ petId }: { petId: string }) {
           ))
         ) : (
           <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100">
-            <div className="text-5xl mb-3">🚶</div>
+            <Footprints className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">まだ散歩の記録がありません</p>
           </div>
         )}

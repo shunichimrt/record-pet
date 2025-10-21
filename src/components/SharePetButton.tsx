@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import QRCode from 'qrcode'
+import { Link2, X, Sparkles, Target, QrCode, Copy, Download, Lock, Info, Clock, Shield } from 'lucide-react'
 
 interface ShareToken {
   id: string
@@ -115,7 +116,7 @@ export default function SharePetButton({
         onClick={() => setShowDialog(true)}
         className="w-full gradient-accent text-white px-6 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
       >
-        <span className="text-xl">🔗</span>
+        <Link2 className="w-5 h-5" />
         共有リンク作成
       </button>
 
@@ -125,7 +126,9 @@ export default function SharePetButton({
             <div className="p-8">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl">🔗</span>
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#A06CD5] to-[#C084FC] rounded-xl flex items-center justify-center">
+                    <Link2 className="w-6 h-6 text-white" />
+                  </div>
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-[#A06CD5] to-[#C084FC] bg-clip-text text-transparent">
                     ペット共有
                   </h2>
@@ -138,18 +141,19 @@ export default function SharePetButton({
                   }}
                   className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-all"
                 >
-                  <span className="text-2xl">✕</span>
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Generate new token */}
               <div className="mb-6 p-6 bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-100">
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xl">✨</span>
+                  <Sparkles className="w-5 h-5 text-purple-600" />
                   <h3 className="font-bold text-gray-800">新しいリンクを作成</h3>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
                     有効期限
                   </label>
                   <select
@@ -170,12 +174,12 @@ export default function SharePetButton({
                 >
                   {loading ? (
                     <>
-                      <span className="animate-spin">⏳</span>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                       生成中...
                     </>
                   ) : (
                     <>
-                      <span>🎯</span>
+                      <Target className="w-5 h-5" />
                       リンクを生成
                     </>
                   )}
@@ -186,7 +190,7 @@ export default function SharePetButton({
               {qrCodeUrl && (
                 <div className="mb-6 p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl border border-green-100 animate-fade-in">
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-xl">📱</span>
+                    <QrCode className="w-5 h-5 text-green-600" />
                     <h3 className="font-bold text-gray-800">QRコード</h3>
                   </div>
                   <div className="bg-white p-4 rounded-xl mb-4 flex justify-center">
@@ -208,7 +212,7 @@ export default function SharePetButton({
                         onClick={copyToClipboard}
                         className="px-4 py-3 bg-gray-700 hover:bg-gray-800 text-white rounded-xl font-semibold transition-all flex items-center gap-2"
                       >
-                        <span>📋</span>
+                        <Copy className="w-4 h-4" />
                         <span className="hidden sm:inline">コピー</span>
                       </button>
                     </div>
@@ -216,7 +220,7 @@ export default function SharePetButton({
                       onClick={downloadQR}
                       className="w-full px-4 py-3 bg-green-600 text-white hover:bg-green-700 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
                     >
-                      <span>⬇️</span>
+                      <Download className="w-5 h-5" />
                       QRコードをダウンロード
                     </button>
                   </div>
@@ -226,12 +230,12 @@ export default function SharePetButton({
               {/* Active tokens list */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="text-xl">🔐</span>
+                  <Lock className="w-5 h-5 text-gray-700" />
                   <h3 className="font-bold text-gray-800">アクティブなリンク</h3>
                 </div>
                 {!isAdmin && (
                   <div className="flex items-center gap-2 text-xs text-blue-700 bg-blue-50 p-3 rounded-xl mb-4 border border-blue-100">
-                    <span>ℹ️</span>
+                    <Info className="w-4 h-4 flex-shrink-0" />
                     <p>管理者のみリンクを無効化できます</p>
                   </div>
                 )}
@@ -246,13 +250,13 @@ export default function SharePetButton({
                         <div className="flex justify-between items-center gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-sm">🔗</span>
+                              <Link2 className="w-4 h-4 text-gray-600" />
                               <div className="text-xs font-mono text-gray-600 truncate bg-gray-100 px-2 py-1 rounded">
                                 {token.token.substring(0, 20)}...
                               </div>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <span>⏰</span>
+                              <Clock className="w-3.5 h-3.5" />
                               <span>
                                 有効期限: {new Date(token.expires_at).toLocaleDateString('ja-JP')}
                               </span>
@@ -263,7 +267,7 @@ export default function SharePetButton({
                               onClick={() => revokeToken(token.id)}
                               className="text-xs px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold transition-all flex items-center gap-1"
                             >
-                              <span>🚫</span>
+                              <Shield className="w-4 h-4" />
                               無効化
                             </button>
                           )}
@@ -273,7 +277,7 @@ export default function SharePetButton({
                   </div>
                 ) : (
                   <div className="text-center py-8 text-gray-400">
-                    <div className="text-4xl mb-2">🔍</div>
+                    <Lock className="w-10 h-10 mx-auto mb-2 text-gray-300" />
                     <p className="text-sm">アクティブなリンクがありません</p>
                   </div>
                 )}

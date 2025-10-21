@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
+import { Lightbulb, Sparkles, Database, Tag, MessageCircle, Save, Edit, X, Loader2 } from 'lucide-react'
 
 interface Meta {
   id: string
@@ -81,7 +82,7 @@ export default function PetMeta({ petId }: { petId: string }) {
       {/* Description */}
       <div className="bg-gradient-to-br from-blue-50 to-white p-5 rounded-2xl border border-blue-100">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">💡</span>
+          <Lightbulb className="w-5 h-5 text-blue-600" />
           <h3 className="font-bold text-gray-800">カスタムフィールドについて</h3>
         </div>
         <p className="text-sm text-gray-700 leading-relaxed">
@@ -96,7 +97,7 @@ export default function PetMeta({ petId }: { petId: string }) {
           onClick={() => setShowForm(true)}
           className="w-full gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
         >
-          <span>✨</span>
+          <Sparkles className="w-5 h-5" />
           フィールドを追加
         </button>
       )}
@@ -105,13 +106,13 @@ export default function PetMeta({ petId }: { petId: string }) {
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-gradient-to-br from-cyan-50 to-white p-6 rounded-2xl border border-cyan-100 space-y-5 animate-fade-in">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">📊</span>
+            <Database className="w-6 h-6 text-cyan-600" />
             <h3 className="font-bold text-gray-800">{editingId ? 'フィールドを編集' : 'フィールドを追加'}</h3>
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <span>🏷️</span>
+              <Tag className="w-4 h-4" />
               フィールド名 *
             </label>
             <input
@@ -125,7 +126,7 @@ export default function PetMeta({ petId }: { petId: string }) {
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <span>💬</span>
+              <MessageCircle className="w-4 h-4" />
               値 *
             </label>
             <input
@@ -142,7 +143,7 @@ export default function PetMeta({ petId }: { petId: string }) {
               type="submit"
               className="flex-1 gradient-primary text-white py-3 px-6 rounded-xl font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
             >
-              <span>{editingId ? '✏️' : '💾'}</span>
+              {editingId ? <Edit className="w-5 h-5" /> : <Save className="w-5 h-5" />}
               {editingId ? '更新' : '保存'}
             </button>
             <button
@@ -150,7 +151,7 @@ export default function PetMeta({ petId }: { petId: string }) {
               onClick={resetForm}
               className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
             >
-              <span>✕</span>
+              <X className="w-5 h-5" />
               キャンセル
             </button>
           </div>
@@ -161,7 +162,7 @@ export default function PetMeta({ petId }: { petId: string }) {
       <div className="space-y-3">
         {loading ? (
           <div className="text-center py-12">
-            <span className="text-4xl animate-spin inline-block">⏳</span>
+            <Loader2 className="w-10 h-10 animate-spin text-gray-400 mx-auto" />
             <p className="text-gray-500 mt-3">読み込み中...</p>
           </div>
         ) : metas.length > 0 ? (
@@ -175,7 +176,7 @@ export default function PetMeta({ petId }: { petId: string }) {
                 <div className="flex flex-col sm:flex-row justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 text-sm font-bold text-gray-600 mb-1">
-                      <span>📊</span>
+                      <Database className="w-4 h-4" />
                       <span>{meta.meta_key}</span>
                     </div>
                     <div className="text-gray-900 font-medium text-lg bg-cyan-100 px-4 py-2 rounded-xl inline-block">
@@ -202,7 +203,7 @@ export default function PetMeta({ petId }: { petId: string }) {
           </div>
         ) : (
           <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100">
-            <div className="text-5xl mb-3">📊</div>
+            <Database className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-500">まだカスタムフィールドがありません</p>
           </div>
         )}

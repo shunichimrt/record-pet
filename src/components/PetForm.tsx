@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import Link from 'next/link'
+import { PawPrint, Dog, Cat, Bird, Fish, Rabbit, Ham, FileText, Cake, Image, StickyNote, Save, Edit, X, AlertCircle } from 'lucide-react'
 
 interface Pet {
   id: string
@@ -114,14 +115,14 @@ export default function PetForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-sm flex items-center gap-2 animate-slide-in">
-          <span>⚠️</span>
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       <div>
         <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <span>🐾</span>
+          <PawPrint className="w-4 h-4" />
           名前 *
         </label>
         <input
@@ -137,7 +138,7 @@ export default function PetForm({
 
       <div>
         <label htmlFor="species" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <span>🐕</span>
+          <Dog className="w-4 h-4" />
           種類 *
         </label>
         <select
@@ -146,19 +147,19 @@ export default function PetForm({
           onChange={(e) => setSpecies(e.target.value)}
           className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
         >
-          <option value="dog">🐕 犬</option>
-          <option value="cat">🐈 猫</option>
-          <option value="bird">🐦 鳥</option>
-          <option value="fish">🐟 魚</option>
-          <option value="rabbit">🐰 うさぎ</option>
-          <option value="hamster">🐹 ハムスター</option>
-          <option value="other">🐾 その他</option>
+          <option value="dog">犬</option>
+          <option value="cat">猫</option>
+          <option value="bird">鳥</option>
+          <option value="fish">魚</option>
+          <option value="rabbit">うさぎ</option>
+          <option value="hamster">ハムスター</option>
+          <option value="other">その他</option>
         </select>
       </div>
 
       <div>
         <label htmlFor="breed" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <span>📝</span>
+          <FileText className="w-4 h-4" />
           品種
         </label>
         <input
@@ -173,7 +174,7 @@ export default function PetForm({
 
       <div>
         <label htmlFor="birthDate" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <span>🎂</span>
+          <Cake className="w-4 h-4" />
           誕生日
         </label>
         <input
@@ -187,7 +188,7 @@ export default function PetForm({
 
       <div>
         <label htmlFor="gender" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <span>⚧️</span>
+          <PawPrint className="w-4 h-4" />
           性別
         </label>
         <select
@@ -196,15 +197,15 @@ export default function PetForm({
           onChange={(e) => setGender(e.target.value)}
           className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
         >
-          <option value="male">♂️ オス</option>
-          <option value="female">♀️ メス</option>
-          <option value="unknown">❓ 不明</option>
+          <option value="male">オス</option>
+          <option value="female">メス</option>
+          <option value="unknown">不明</option>
         </select>
       </div>
 
       <div>
         <label htmlFor="avatar" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <span>📸</span>
+          <Image className="w-4 h-4" />
           アバター画像
         </label>
         {pet?.avatar_url && !avatarFile && (
@@ -225,7 +226,7 @@ export default function PetForm({
         />
         {uploading && (
           <p className="text-sm text-[#FF8E53] mt-2 flex items-center gap-2 animate-fade-in">
-            <span className="animate-spin">⏳</span>
+            <div className="w-4 h-4 border-2 border-[#FF8E53] border-t-transparent rounded-full animate-spin" />
             画像をアップロード中...
           </p>
         )}
@@ -233,7 +234,7 @@ export default function PetForm({
 
       <div>
         <label htmlFor="notes" className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-          <span>📋</span>
+          <StickyNote className="w-4 h-4" />
           メモ
         </label>
         <textarea
@@ -254,17 +255,17 @@ export default function PetForm({
         >
           {loading ? (
             <>
-              <span className="animate-spin">⏳</span>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               保存中...
             </>
           ) : pet ? (
             <>
-              <span>✏️</span>
+              <Edit className="w-5 h-5" />
               ペットを更新
             </>
           ) : (
             <>
-              <span>✨</span>
+              <Save className="w-5 h-5" />
               ペットを作成
             </>
           )}
@@ -273,7 +274,7 @@ export default function PetForm({
           href={pet ? `/app/pets/${pet.id}` : '/app/pets'}
           className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-all text-center flex items-center justify-center gap-2"
         >
-          <span>✕</span>
+          <X className="w-5 h-5" />
           キャンセル
         </Link>
       </div>

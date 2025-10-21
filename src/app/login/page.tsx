@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { PawPrint, Dog, Cat, Mail, Lock, Loader2, Sparkles, LogIn } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -48,16 +49,18 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center gradient-secondary relative overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-10">
-        <div className="absolute top-20 left-20 text-9xl">🐾</div>
-        <div className="absolute bottom-20 right-20 text-9xl">🐾</div>
-        <div className="absolute top-1/2 left-1/3 text-6xl">🐕</div>
-        <div className="absolute top-1/3 right-1/4 text-6xl">🐈</div>
+      <div className="absolute top-0 left-0 w-full h-full opacity-10 text-gray-400">
+        <PawPrint className="absolute top-20 left-20 w-36 h-36" />
+        <PawPrint className="absolute bottom-20 right-20 w-36 h-36" />
+        <Dog className="absolute top-1/2 left-1/3 w-24 h-24" />
+        <Cat className="absolute top-1/3 right-1/4 w-24 h-24" />
       </div>
 
       <div className="max-w-md w-full space-y-8 p-10 glass-effect rounded-2xl shadow-xl relative z-10 m-4 animate-fade-in">
         <div className="text-center">
-          <div className="text-6xl mb-4">🐾</div>
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#FF8E53] to-[#FF6B6B] rounded-2xl flex items-center justify-center mb-4">
+            <PawPrint className="w-10 h-10 text-white" />
+          </div>
           <h2 className="text-4xl font-bold bg-gradient-to-r from-[#FF8E53] to-[#FF6B6B] bg-clip-text text-transparent mb-2">
             Record Pet
           </h2>
@@ -74,7 +77,8 @@ export default function LoginPage() {
           )}
 
           <div className="space-y-1">
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <Mail className="w-4 h-4" />
               メールアドレス
             </label>
             <input
@@ -89,7 +93,8 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <Lock className="w-4 h-4" />
               パスワード
             </label>
             <input
@@ -110,12 +115,12 @@ export default function LoginPage() {
           >
             {loading ? (
               <>
-                <span className="animate-spin">⏳</span>
+                <Loader2 className="w-5 h-5 animate-spin" />
                 読み込み中...
               </>
             ) : (
               <>
-                <span>{isSignUp ? '🎉' : '🔐'}</span>
+                {isSignUp ? <Sparkles className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
                 {isSignUp ? 'サインアップ' : 'サインイン'}
               </>
             )}
