@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { FileText, Footprints, UtensilsCrossed, Star, Database, Dog, Cat, Bird, Fish, Rabbit, Ham, PawPrint, Edit, Cake, StickyNote, ArrowLeft } from 'lucide-react'
+import { FileText, Footprints, UtensilsCrossed, Star, Database, Dog, Cat, Bird, Fish, Rabbit, Ham, PawPrint, Edit, Cake, StickyNote, ArrowLeft, Heart, Pill } from 'lucide-react'
 import DeletePetButton from '@/components/DeletePetButton'
 import DownloadPdfButton from '@/components/DownloadPdfButton'
 import SharePetButton from '@/components/SharePetButton'
@@ -10,6 +10,8 @@ import PetWalks from '@/components/PetWalks'
 import PetMeals from '@/components/PetMeals'
 import PetTraits from '@/components/PetTraits'
 import PetMeta from '@/components/PetMeta'
+import PetHealthRecords from '@/components/PetHealthRecords'
+import PetMedications from '@/components/PetMedications'
 
 interface Pet {
   id: string
@@ -22,7 +24,7 @@ interface Pet {
   notes?: string
 }
 
-type Tab = 'details' | 'walks' | 'meals' | 'traits' | 'meta'
+type Tab = 'details' | 'walks' | 'meals' | 'health' | 'medications' | 'traits' | 'meta'
 
 export default function PetDetailTabs({
   pet,
@@ -37,6 +39,8 @@ export default function PetDetailTabs({
     { id: 'details', label: '詳細', icon: <FileText className="w-4 h-4" /> },
     { id: 'walks', label: '散歩', icon: <Footprints className="w-4 h-4" /> },
     { id: 'meals', label: '食事', icon: <UtensilsCrossed className="w-4 h-4" /> },
+    { id: 'health', label: '健康', icon: <Heart className="w-4 h-4" /> },
+    { id: 'medications', label: '投薬', icon: <Pill className="w-4 h-4" /> },
     { id: 'traits', label: '特徴', icon: <Star className="w-4 h-4" /> },
     { id: 'meta', label: 'その他', icon: <Database className="w-4 h-4" /> },
   ]
@@ -224,6 +228,8 @@ export default function PetDetailTabs({
 
             {activeTab === 'walks' && <PetWalks petId={pet.id} />}
             {activeTab === 'meals' && <PetMeals petId={pet.id} />}
+            {activeTab === 'health' && <PetHealthRecords petId={pet.id} />}
+            {activeTab === 'medications' && <PetMedications petId={pet.id} />}
             {activeTab === 'traits' && <PetTraits petId={pet.id} />}
             {activeTab === 'meta' && <PetMeta petId={pet.id} />}
           </div>

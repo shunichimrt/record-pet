@@ -33,10 +33,12 @@ Run the SQL commands in the following order in your Supabase SQL Editor:
 3. `supabase/migration_pets.sql` - Creates pets table
 4. `supabase/storage_setup.sql` - Sets up Storage bucket for pet avatars
 5. `supabase/migration_pet_activities.sql` - Creates pet_walks, pet_meals, pet_traits, and pet_meta tables
-6. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
-7. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
-8. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
-9. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
+6. `supabase/migration_pet_health.sql` - Creates pet_health_records table for daily health tracking
+7. `supabase/migration_pet_medications.sql` - Creates pet_medications and pet_medication_logs tables
+8. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
+9. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
+10. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
+11. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
 
 ### 4. Run the development server
 
@@ -66,6 +68,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
 - **Pet Activity Tracking**:
   - **Walks**: Record walk date/time, duration, distance, and notes with date range filtering
   - **Meals**: Track feeding times, food type, amount, and notes with date range filtering
+  - **Health Records**: Daily health tracking with appetite level (1-5 scale), bathroom times/notes, mood level, and activity level
+  - **Medications**: Manage medication schedules with dosage, frequency, start/end dates, and medication logs for tracking when medications were given
   - **Traits**: Store pet characteristics and personality traits (e.g., favorite toys, fears)
   - **Meta**: Custom key-value fields for any additional pet information (e.g., microchip ID, vet contact)
 - **PDF Export**:
@@ -129,6 +133,8 @@ src/
 │   ├── PetDetailTabs.tsx     # Pet detail page with tabs
 │   ├── PetWalks.tsx          # Walk records with date filtering
 │   ├── PetMeals.tsx          # Meal records with date filtering
+│   ├── PetHealthRecords.tsx  # Daily health tracking (appetite, mood, activity, bathroom)
+│   ├── PetMedications.tsx    # Medication management with logs
 │   ├── PetTraits.tsx         # Pet traits management
 │   ├── PetMeta.tsx           # Custom fields management
 │   ├── DownloadPdfButton.tsx # PDF download with date range picker
@@ -208,6 +214,40 @@ src/
 - `meta_value`: Text
 - `created_at`: Timestamp
 - `updated_at`: Timestamp
+
+### pet_health_records
+- `id`: UUID (primary key)
+- `pet_id`: UUID (foreign key to pets)
+- `recorded_at`: Timestamp
+- `appetite_level`: Integer (1-5 scale, nullable)
+- `bathroom_times`: Integer (nullable)
+- `bathroom_notes`: Text (nullable)
+- `mood_level`: Integer (1-5 scale, nullable)
+- `activity_level`: Integer (1-5 scale, nullable)
+- `health_notes`: Text (nullable)
+- `created_at`: Timestamp
+- `updated_at`: Timestamp
+
+### pet_medications
+- `id`: UUID (primary key)
+- `pet_id`: UUID (foreign key to pets)
+- `medication_name`: Text
+- `dosage`: Text (nullable)
+- `frequency`: Text (nullable)
+- `start_date`: Date
+- `end_date`: Date (nullable)
+- `notes`: Text (nullable)
+- `is_active`: Boolean
+- `created_at`: Timestamp
+- `updated_at`: Timestamp
+
+### pet_medication_logs
+- `id`: UUID (primary key)
+- `medication_id`: UUID (foreign key to pet_medications)
+- `given_at`: Timestamp
+- `given_by`: UUID (foreign key to auth.users, nullable)
+- `notes`: Text (nullable)
+- `created_at`: Timestamp
 
 ### share_tokens
 - `id`: UUID (primary key)
