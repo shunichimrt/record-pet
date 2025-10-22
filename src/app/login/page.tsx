@@ -59,7 +59,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8 p-10 glass-effect rounded-2xl shadow-xl relative z-10 m-4 animate-fade-in">
         <div className="text-center">
           <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#FF8E53] to-[#FF6B6B] rounded-2xl flex items-center justify-center mb-4">
-            <PawPrint className="w-10 h-10 text-white" />
+            <img src="/icon.png" alt="Record Pet" className="w-15 h-15" />
           </div>
           <h2 className="text-4xl font-bold bg-gradient-to-r from-[#FF8E53] to-[#FF6B6B] bg-clip-text text-transparent mb-2">
             Record Pet
