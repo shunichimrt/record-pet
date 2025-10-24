@@ -88,6 +88,36 @@
     --gray-50: #2C3E50;
     --gray-100: #34495E;
   }
+
+  /* ダークモードでの入力フィールドのテキストカラー */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"],
+  input[type="search"],
+  textarea,
+  select {
+    color: #EAEAEA !important;
+  }
+
+  input[type="text"]::placeholder,
+  input[type="email"]::placeholder,
+  input[type="password"]::placeholder,
+  input[type="number"]::placeholder,
+  input[type="tel"]::placeholder,
+  input[type="url"]::placeholder,
+  input[type="date"]::placeholder,
+  input[type="datetime-local"]::placeholder,
+  input[type="time"]::placeholder,
+  input[type="search"]::placeholder,
+  textarea::placeholder {
+    color: #9CA3AF !important;
+  }
 }
 
 body {
@@ -98,6 +128,36 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Form Input Styles - すべての入力フィールドのテキストを見やすく */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="search"],
+textarea,
+select {
+  color: var(--gray-900) !important;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="url"]::placeholder,
+input[type="date"]::placeholder,
+input[type="datetime-local"]::placeholder,
+input[type="time"]::placeholder,
+input[type="search"]::placeholder,
+textarea::placeholder {
+  color: var(--gray-400) !important;
 }
 
 /* Utility Classes */

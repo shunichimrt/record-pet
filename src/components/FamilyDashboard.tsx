@@ -186,7 +186,7 @@ export default function FamilyDashboard({
               </div>
               <h2 className="text-base sm:text-lg font-bold text-gray-800">家族ID</h2>
             </div>
-            <div className="bg-white/80 backdrop-blur p-3 sm:p-4 rounded-xl font-mono text-xs sm:text-sm break-all border-2 border-dashed border-blue-200 mb-2">
+            <div className="bg-white/80 backdrop-blur p-3 sm:p-4 rounded-xl font-mono text-xs sm:text-sm break-all border-2 border-dashed border-blue-200 mb-2 text-gray-900">
               {familyId}
             </div>
             <p className="text-xs text-gray-600 flex items-center gap-1.5">

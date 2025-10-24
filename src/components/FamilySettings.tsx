@@ -183,7 +183,7 @@ export default function FamilySettings({
               <Key className="w-5 h-5" />
               家族ID
             </h2>
-            <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200 font-mono text-sm break-all">
+            <div className="bg-gradient-to-r from-gray-50 to-white p-4 rounded-xl border border-gray-200 font-mono text-sm break-all text-gray-900">
               {family.id}
             </div>
             <p className="text-xs text-gray-600 mt-3 flex items-center gap-2">
