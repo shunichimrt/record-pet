@@ -37,23 +37,67 @@ Run the SQL commands in the following order in your Supabase SQL Editor:
 7. `supabase/migration_pet_medications.sql` - Creates pet_medications and pet_medication_logs tables
 8. `supabase/migration_food_products.sql` - Creates pet_food_products table and updates pet_meals for calorie tracking
 9. `supabase/migration_admin_roles.sql` - Creates admin_users table for system administrators
-10. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
-11. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
-12. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
-13. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
+10. `supabase/migration_fix_admin_rls.sql` - **IMPORTANT: Fixes admin RLS circular reference**
+11. `supabase/migration_system_admin_separation.sql` - **IMPORTANT: Separates system admins from regular users**
+12. `supabase/migration_admin_statistics.sql` - **IMPORTANT: Creates functions for system-wide statistics**
+13. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
+14. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
+15. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
+16. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
 
-### 4. Set up admin user (Optional)
+### 4. Set up system administrator (Optional - For Record-Pet Operators Only)
 
-To enable the admin panel, you need to add your user to the admin_users table:
+**Important**: This is for system administrators who operate Record-Pet, NOT for family administrators.
 
-1. Log in to the application
-2. Go to Supabase Dashboard → Authentication → Users
-3. Copy your user ID
-4. Go to SQL Editor and run:
+**System administrators are completely separate from regular users**:
+- System admins can ONLY access `/admin` (application management)
+- Regular users can ONLY access `/app` (family and pet management)
+- A user cannot be both a system admin and a regular user
+
+To create a system administrator account:
+
+#### Step 1: Create user in Supabase Dashboard
+
+**Important**: Do NOT use the `/login` signup page. System admins are created directly in Supabase.
+
+1. Go to Supabase Dashboard → **Authentication** → **Users**
+2. Click **Add User** button (or **Invite**)
+3. Enter:
+   - **Email**: Admin's email address
+   - **Password**: Secure password (or send invite email)
+   - **Auto Confirm User**: Check this box (or confirm via email)
+4. Click **Create User** (or **Send Invitation**)
+5. Copy the **User ID** (UUID format) from the users list
+
+#### Step 2: Run database migrations
+
+Go to Supabase Dashboard → **SQL Editor** and run:
+
 ```sql
-INSERT INTO admin_users (user_id) VALUES ('your-user-id-here');
+-- First, run the RLS fix migration
+-- (Copy and paste the contents of supabase/migration_fix_admin_rls.sql)
+
+-- Then, run the system admin separation migration
+-- (Copy and paste the contents of supabase/migration_system_admin_separation.sql)
+
+-- Then, run the admin statistics migration (for dashboard stats)
+-- (Copy and paste the contents of supabase/migration_admin_statistics.sql)
+
+-- Finally, add your user as a system administrator
+INSERT INTO admin_users (user_id, is_system_only)
+VALUES ('paste-user-id-here', TRUE);
 ```
-5. You can now access the admin panel at `/admin`
+
+#### Step 3: Log in
+
+1. Go to your application login page
+2. Enter the system admin email and password
+3. You will be automatically redirected to `/admin` (not `/app`)
+4. System admins cannot access `/app` routes (they are redirected back to `/admin`)
+
+**Security Note**: System admin accounts should only be created by database administrators with direct Supabase access. Never use the public signup form for system admins.
+
+**Note**: Family administrators (who manage their family) are set up differently through the family creation process and access `/app/settings`, not `/admin`.
 
 ### 5. Run the development server
 
@@ -63,6 +107,35 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser.
 
+## Administrator Types
+
+This application has **two completely separate types of administrators**:
+
+### 1. System Administrators (Record-Pet運営者)
+- **Purpose**: Operate and manage the Record-Pet application itself
+- **Database**: `admin_users` table
+- **Access**: `/admin` panel
+- **Permissions**:
+  - Create/edit/delete public food products for all users
+  - View system-wide statistics
+  - System configuration
+- **Setup**: Manually added to `admin_users` table by database operators
+- **Check function**: `isAdmin(userId)` in `lib/admin.ts`
+
+### 2. Family Administrators (家族内の管理者)
+- **Purpose**: Manage their own family group
+- **Database**: `family_members.is_admin` column
+- **Access**: `/app/settings` page
+- **Permissions**:
+  - Manage family members (add/remove, change roles)
+  - Change family name
+  - Delete pets in their family
+  - Revoke share tokens for their family's pets
+- **Setup**: Automatically set when creating a family, or granted by existing family admin
+- **Check function**: `checkIsAdmin(userId, familyId)` in `lib/permissions.ts`
+
+**Important**: These are completely separate roles using different database tables, different routes, and different permission systems. A user can be one, both, or neither.
+
 ## Features
 
 - **Authentication**: Email/password authentication with Supabase Auth
@@ -71,8 +144,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
   - Create a new family with role selection (father/mother/son/daughter/other)
   - Join existing family by ID
   - View family members with roles
-  - Admin-only member management (add/remove members, change admin status)
+  - **Family Admin** controls (add/remove members, change admin status) - `/app/settings`
   - Leave family
+  - **Note**: Family admins (`family_members.is_admin=true`) are different from system administrators
 - **Pet Management**:
   - Create, view, edit, and delete pets
   - Upload pet avatar images with Supabase Storage
@@ -95,12 +169,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
   - All users can select from public products for calorie calculation
   - Manual entry mode available for unlisted foods
   - Search and filter by species, brand, and product type
-- **Admin Panel** (`/admin`) - System Administrators Only:
+- **System Admin Panel** (`/admin`) - **Record-Pet Operators Only**:
+  - **Completely separate from family administrators**
   - System-wide administration dashboard
   - **Create and manage public food products** available to all users
   - View system statistics (users, pets, products)
-  - Completely separated from user interface for security
   - Only users in `admin_users` table can access
+  - **Different from family admins**: Family admins manage their family at `/app/settings`, system admins manage the entire application at `/admin`
 - **PDF Export**:
   - Generate comprehensive PDF reports of pet records
   - A4 portrait layout with professional styling

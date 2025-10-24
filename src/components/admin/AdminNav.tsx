@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { ShieldCheck, Package, LayoutDashboard, LogOut, ArrowLeft } from 'lucide-react'
+import { ShieldCheck, Package, LayoutDashboard, LogOut } from 'lucide-react'
 
 interface User {
   id: string
@@ -35,9 +35,12 @@ export default function AdminNav({ user }: { user: User }) {
             <div className="flex-shrink-0 flex items-center">
               <Link href="/admin" className="flex items-center gap-2">
                 <ShieldCheck className="w-8 h-8 text-red-600" />
-                <span className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                  Admin Panel
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+                    System Admin
+                  </span>
+                  <span className="text-xs text-gray-500">Record-Pet運営者専用</span>
+                </div>
               </Link>
             </div>
 
@@ -66,14 +69,6 @@ export default function AdminNav({ user }: { user: User }) {
 
           {/* Right side */}
           <div className="flex items-center gap-4">
-            <Link
-              href="/app"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              ユーザー画面
-            </Link>
-
             <div className="text-sm text-gray-600">
               {user.email}
             </div>

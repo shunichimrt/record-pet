@@ -19,11 +19,15 @@ export default async function AdminLayout({
     redirect('/login')
   }
 
-  // Check if user is admin
-  const adminStatus = await isAdmin(user.id)
+  // Check if user is system administrator
+  const { data: adminData } = await supabase
+    .from('admin_users')
+    .select('is_system_only')
+    .eq('user_id', user.id)
+    .single()
 
-  // Redirect to app if not admin
-  if (!adminStatus) {
+  // Must be a system-only administrator to access
+  if (!adminData || adminData.is_system_only !== true) {
     redirect('/app')
   }
 

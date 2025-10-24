@@ -31,12 +31,29 @@ export default function LoginPage() {
         if (error) throw error
         alert('Check your email for the confirmation link!')
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
         if (error) throw error
-        router.push('/app')
+
+        // Check if user is system administrator
+        if (data.user) {
+          const { data: adminData } = await supabase
+            .from('admin_users')
+            .select('is_system_only')
+            .eq('user_id', data.user.id)
+            .single()
+
+          // Redirect system admins to /admin, regular users to /app
+          if (adminData?.is_system_only === true) {
+            router.push('/admin')
+          } else {
+            router.push('/app')
+          }
+        } else {
+          router.push('/app')
+        }
         router.refresh()
       }
     } catch (err) {

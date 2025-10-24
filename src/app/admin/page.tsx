@@ -1,56 +1,60 @@
 import { createClient } from '@/lib/supabase/server'
-import { LayoutDashboard, Package, Users, Database } from 'lucide-react'
+import { LayoutDashboard, Package, Users, Database, Home } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function AdminDashboard() {
   const supabase = await createClient()
 
-  // Get statistics
-  const { count: productsCount } = await supabase
-    .from('pet_food_products')
-    .select('*', { count: 'exact', head: true })
+  // Get system-wide statistics using SECURITY DEFINER functions
+  // These functions bypass RLS to get accurate counts
+  const { data: statsData } = await supabase.rpc('get_system_statistics')
 
-  const { count: publicProductsCount } = await supabase
-    .from('pet_food_products')
-    .select('*', { count: 'exact', head: true })
-    .eq('is_public', true)
-
-  const { count: usersCount } = await supabase
-    .from('family_members')
-    .select('user_id', { count: 'exact', head: true })
-
-  const { count: petsCount } = await supabase
-    .from('pets')
-    .select('*', { count: 'exact', head: true })
+  const productsCount = statsData?.total_food_products || 0
+  const publicProductsCount = statsData?.public_food_products || 0
+  const usersCount = statsData?.total_users || 0
+  const petsCount = statsData?.total_pets || 0
+  const familiesCount = statsData?.total_families || 0
 
   const stats = [
     {
-      label: '総製品数',
-      value: productsCount || 0,
-      icon: Package,
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'from-blue-50 to-blue-100',
-    },
-    {
-      label: '公開製品数',
-      value: publicProductsCount || 0,
-      icon: Database,
-      color: 'from-green-500 to-green-600',
-      bgColor: 'from-green-50 to-green-100',
-    },
-    {
       label: '総ユーザー数',
-      value: usersCount || 0,
+      value: usersCount,
       icon: Users,
       color: 'from-purple-500 to-purple-600',
       bgColor: 'from-purple-50 to-purple-100',
+      description: 'システム登録ユーザー',
+    },
+    {
+      label: '総家族数',
+      value: familiesCount,
+      icon: Home,
+      color: 'from-pink-500 to-pink-600',
+      bgColor: 'from-pink-50 to-pink-100',
+      description: '登録されている家族',
     },
     {
       label: '総ペット数',
-      value: petsCount || 0,
+      value: petsCount,
       icon: Users,
       color: 'from-orange-500 to-orange-600',
       bgColor: 'from-orange-50 to-orange-100',
+      description: 'すべての家族のペット',
+    },
+    {
+      label: '総製品数',
+      value: productsCount,
+      icon: Package,
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'from-blue-50 to-blue-100',
+      description: 'フード製品データベース',
+    },
+    {
+      label: '公開製品数',
+      value: publicProductsCount,
+      icon: Database,
+      color: 'from-green-500 to-green-600',
+      bgColor: 'from-green-50 to-green-100',
+      description: '全ユーザーが使用可能',
     },
   ]
 
@@ -68,7 +72,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
@@ -76,18 +80,21 @@ export default async function AdminDashboard() {
               key={index}
               className={`bg-gradient-to-br ${stat.bgColor} rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-medium text-gray-600">
                     {stat.label}
                   </p>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {stat.value}
-                  </p>
+                  <div className={`p-2 bg-gradient-to-br ${stat.color} rounded-lg`}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
                 </div>
-                <div className={`p-3 bg-gradient-to-br ${stat.color} rounded-xl`}>
-                  <Icon className="w-6 h-6 text-white" />
-                </div>
+                <p className="text-3xl font-bold text-gray-900 mb-1">
+                  {stat.value}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {stat.description}
+                </p>
               </div>
             </div>
           )
