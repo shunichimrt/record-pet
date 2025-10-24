@@ -73,29 +73,30 @@ export default function AdBanner({
           </span>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center gap-6 p-6">
+        <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6 p-4 md:p-6">
           {/* Image Section */}
           {imageUrl && (
-            <div className="flex-shrink-0 w-full md:w-48 h-32 md:h-24 relative rounded-xl overflow-hidden bg-white shadow-sm">
+            <div className="flex-shrink-0 w-full md:w-48 h-24 md:h-24 relative rounded-xl overflow-hidden bg-white shadow-sm">
               <img
                 src={imageUrl}
                 alt={title}
-                className="w-full h-full object-contain p-4"
+                className="w-full h-full object-contain p-2 md:p-4"
               />
             </div>
           )}
 
           {/* Content Section */}
-          <div className="flex-1 text-center md:text-left">
-            <h3 className={`text-lg md:text-xl font-bold ${textColor} mb-2 group-hover:text-blue-600 transition-colors`}>
+          <div className="flex-1 text-center md:text-left w-full">
+            <h3 className={`text-base md:text-xl font-bold ${textColor} group-hover:text-blue-600 transition-colors`}>
               {title}
             </h3>
+            {/* 説明文と「詳しく見る」リンクはデスクトップのみ表示 */}
             {description && (
-              <p className="text-sm md:text-base text-gray-600 mb-3">
+              <p className="hidden md:block text-base text-gray-600 mt-2 mb-3">
                 {description}
               </p>
             )}
-            <div className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 group-hover:gap-3 transition-all">
+            <div className="hidden md:inline-flex items-center gap-2 text-sm font-semibold text-blue-600 group-hover:gap-3 transition-all mt-2">
               詳しく見る
               <ExternalLink className="w-4 h-4" />
             </div>

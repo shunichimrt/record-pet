@@ -155,7 +155,7 @@ INSERT INTO ad_banners (
 ) VALUES (
   'One Kitchen - ペット用プレミアムフード',
   '愛するペットのために、厳選素材で作られた栄養バランス抜群のフードをお届けします',
-  'https://onekitchen.jp',
+  'https://one-kitchen.jp/',
   'both',
   0,
   TRUE

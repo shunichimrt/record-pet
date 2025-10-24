@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Users, Key, PawPrint, Settings, LogOut, UserCircle2, Crown, Calendar } from 'lucide-react'
-import AdBanner from './AdBanner'
+import AdBannerCarousel from './AdBannerCarousel'
 
 interface Family {
   id: string
@@ -130,6 +130,13 @@ export default function FamilyDashboard({
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-[#E9ECEF] py-12 px-4">
       <div className="max-w-5xl mx-auto animate-fade-in">
+        {/* Advertisement Banners Carousel */}
+        {banners.length > 0 && (
+          <div className="mb-6 lg:mb-8">
+            <AdBannerCarousel banners={banners} position="top" />
+          </div>
+        )}
+
         {/* Hero Section */}
         <div className="bg-white rounded-3xl shadow-lg p-4 sm:p-6 lg:p-8 mb-6 lg:mb-8 card-hover">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-6 mb-6 lg:mb-8">
@@ -283,25 +290,6 @@ export default function FamilyDashboard({
             </button>
           </div>
         </div>
-
-        {/* Advertisement Banners */}
-        {banners.length > 0 && (
-          <div className="space-y-6">
-            {banners.map((banner) => (
-              <AdBanner
-                key={banner.id}
-                id={banner.id}
-                title={banner.title}
-                description={banner.description}
-                imageUrl={banner.image_url}
-                linkUrl={banner.link_url}
-                backgroundColor={banner.background_color}
-                textColor={banner.text_color}
-                position="bottom"
-              />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   )

@@ -12,7 +12,7 @@ import PetTraits from '@/components/PetTraits'
 import PetMeta from '@/components/PetMeta'
 import PetHealthRecords from '@/components/PetHealthRecords'
 import PetMedications from '@/components/PetMedications'
-import AdBanner from '@/components/AdBanner'
+import AdBannerCarousel from '@/components/AdBannerCarousel'
 
 interface Pet {
   id: string
@@ -96,6 +96,13 @@ export default function PetDetailTabs({
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F8F9FA] to-[#E9ECEF] py-12 px-4">
       <div className="max-w-5xl mx-auto animate-fade-in">
+        {/* Advertisement Banners Carousel */}
+        {banners.length > 0 && (
+          <div className="mb-6">
+            <AdBannerCarousel banners={banners} position="top" />
+          </div>
+        )}
+
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
           {/* Header */}
           <div className="p-8 bg-gradient-to-br from-white to-gray-50">
@@ -258,25 +265,6 @@ export default function PetDetailTabs({
             </Link>
           </div>
         </div>
-
-        {/* Advertisement Banners */}
-        {banners.length > 0 && (
-          <div className="space-y-6 mt-6">
-            {banners.map((banner) => (
-              <AdBanner
-                key={banner.id}
-                id={banner.id}
-                title={banner.title}
-                description={banner.description}
-                imageUrl={banner.image_url}
-                linkUrl={banner.link_url}
-                backgroundColor={banner.background_color}
-                textColor={banner.text_color}
-                position="bottom"
-              />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   )

@@ -184,7 +184,12 @@ This application has **two completely separate types of administrators**:
   - Set display position (dashboard, pet detail, or both)
   - Schedule with start/end dates
   - Click tracking for analytics
-  - Displayed on dashboard and pet detail pages
+  - **Automatic carousel slideshow** (5-second intervals)
+    - Multiple banners rotate automatically
+    - Manual navigation with left/right arrow buttons
+    - Banner counter (e.g., "1 / 3") in top-right corner
+    - Pause on hover
+  - Displayed at the top of dashboard and pet detail pages
 - **PDF Export**:
   - Generate comprehensive PDF reports of pet records
   - A4 portrait layout with professional styling
@@ -251,6 +256,7 @@ src/
 │   │   ├── AdminFoodProductsManager.tsx   # Admin food products CRUD
 │   │   └── AdminBannerManager.tsx         # Admin banners CRUD with image upload
 │   ├── AdBanner.tsx          # Advertisement banner display component with click tracking
+│   ├── AdBannerCarousel.tsx  # Auto-rotating carousel for multiple banners
 │   ├── FamilySetup.tsx       # Create/join family flow with role selection
 │   ├── FamilyDashboard.tsx   # Family overview with admin controls
 │   ├── FamilySettings.tsx    # Family settings (family admin only)
