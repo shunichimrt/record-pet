@@ -1,0 +1,131 @@
+import { createClient } from '@/lib/supabase/server'
+import { LayoutDashboard, Package, Users, Database } from 'lucide-react'
+import Link from 'next/link'
+
+export default async function AdminDashboard() {
+  const supabase = await createClient()
+
+  // Get statistics
+  const { count: productsCount } = await supabase
+    .from('pet_food_products')
+    .select('*', { count: 'exact', head: true })
+
+  const { count: publicProductsCount } = await supabase
+    .from('pet_food_products')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_public', true)
+
+  const { count: usersCount } = await supabase
+    .from('family_members')
+    .select('user_id', { count: 'exact', head: true })
+
+  const { count: petsCount } = await supabase
+    .from('pets')
+    .select('*', { count: 'exact', head: true })
+
+  const stats = [
+    {
+      label: '総製品数',
+      value: productsCount || 0,
+      icon: Package,
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'from-blue-50 to-blue-100',
+    },
+    {
+      label: '公開製品数',
+      value: publicProductsCount || 0,
+      icon: Database,
+      color: 'from-green-500 to-green-600',
+      bgColor: 'from-green-50 to-green-100',
+    },
+    {
+      label: '総ユーザー数',
+      value: usersCount || 0,
+      icon: Users,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'from-purple-50 to-purple-100',
+    },
+    {
+      label: '総ペット数',
+      value: petsCount || 0,
+      icon: Users,
+      color: 'from-orange-500 to-orange-600',
+      bgColor: 'from-orange-50 to-orange-100',
+    },
+  ]
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <LayoutDashboard className="w-8 h-8" />
+          管理ダッシュボード
+        </h1>
+        <p className="mt-2 text-gray-600">
+          システム全体の統計情報と管理機能
+        </p>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon
+          return (
+            <div
+              key={index}
+              className={`bg-gradient-to-br ${stat.bgColor} rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    {stat.label}
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {stat.value}
+                  </p>
+                </div>
+                <div className={`p-3 bg-gradient-to-br ${stat.color} rounded-xl`}>
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">
+          クイックアクション
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link
+            href="/admin/food-products"
+            className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200 hover:shadow-md transition-all"
+          >
+            <div className="p-3 bg-orange-600 rounded-lg">
+              <Package className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">フード製品管理</h3>
+              <p className="text-sm text-gray-600">
+                公開製品の追加・編集・削除
+              </p>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Info Box */}
+      <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-200">
+        <h3 className="font-bold text-gray-900 mb-2">管理者権限について</h3>
+        <ul className="text-sm text-gray-700 space-y-1">
+          <li>• すべてのフード製品（公開・プライベート）を管理できます</li>
+          <li>• 公開製品は全ユーザーが使用できます</li>
+          <li>• プライベート製品は作成者のみが使用できます</li>
+        </ul>
+      </div>
+    </div>
+  )
+}

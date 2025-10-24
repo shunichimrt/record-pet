@@ -35,12 +35,27 @@ Run the SQL commands in the following order in your Supabase SQL Editor:
 5. `supabase/migration_pet_activities.sql` - Creates pet_walks, pet_meals, pet_traits, and pet_meta tables
 6. `supabase/migration_pet_health.sql` - Creates pet_health_records table for daily health tracking
 7. `supabase/migration_pet_medications.sql` - Creates pet_medications and pet_medication_logs tables
-8. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
-9. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
-10. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
-11. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
+8. `supabase/migration_food_products.sql` - Creates pet_food_products table and updates pet_meals for calorie tracking
+9. `supabase/migration_admin_roles.sql` - Creates admin_users table for system administrators
+10. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
+11. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
+12. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
+13. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
 
-### 4. Run the development server
+### 4. Set up admin user (Optional)
+
+To enable the admin panel, you need to add your user to the admin_users table:
+
+1. Log in to the application
+2. Go to Supabase Dashboard → Authentication → Users
+3. Copy your user ID
+4. Go to SQL Editor and run:
+```sql
+INSERT INTO admin_users (user_id) VALUES ('your-user-id-here');
+```
+5. You can now access the admin panel at `/admin`
+
+### 5. Run the development server
 
 ```bash
 npm run dev
@@ -67,11 +82,25 @@ Open [http://localhost:3000](http://localhost:3000) with your browser.
   - Only admins can delete pets
 - **Pet Activity Tracking**:
   - **Walks**: Record walk date/time, duration, distance, and notes with date range filtering
-  - **Meals**: Track feeding times, food type, amount, and notes with date range filtering
+  - **Meals**: Track feeding times with calorie calculation
+    - Select from registered food products with automatic calorie calculation
+    - Manual entry mode for custom foods
+    - Calorie tracking per meal
   - **Health Records**: Daily health tracking with appetite level (1-5 scale), bathroom times/notes, mood level, and activity level
   - **Medications**: Manage medication schedules with dosage, frequency, start/end dates, and medication logs for tracking when medications were given
   - **Traits**: Store pet characteristics and personality traits (e.g., favorite toys, fears)
   - **Meta**: Custom key-value fields for any additional pet information (e.g., microchip ID, vet contact)
+- **Food Products Database**:
+  - Public products managed by system administrators
+  - All users can select from public products for calorie calculation
+  - Manual entry mode available for unlisted foods
+  - Search and filter by species, brand, and product type
+- **Admin Panel** (`/admin`) - System Administrators Only:
+  - System-wide administration dashboard
+  - **Create and manage public food products** available to all users
+  - View system statistics (users, pets, products)
+  - Completely separated from user interface for security
+  - Only users in `admin_users` table can access
 - **PDF Export**:
   - Generate comprehensive PDF reports of pet records
   - A4 portrait layout with professional styling
@@ -108,13 +137,18 @@ Or connect your repository to Vercel for automatic deployments.
 ```
 src/
 ├── app/
+│   ├── admin/           # Admin panel (system administrators only)
+│   │   ├── layout.tsx              # Admin layout with navigation
+│   │   ├── page.tsx                # Admin dashboard
+│   │   └── food-products/page.tsx  # Food products management
 │   ├── api/
 │   │   └── pets/
 │   │       └── [id]/
 │   │           ├── pdf/route.ts   # PDF generation API
 │   │           └── share/route.ts # Share token management API
-│   ├── app/
+│   ├── app/             # User interface (family members)
 │   │   ├── page.tsx           # Family dashboard
+│   │   ├── settings/page.tsx  # Family settings (admins only)
 │   │   └── pets/
 │   │       ├── page.tsx       # Pets list
 │   │       ├── new/page.tsx   # Create pet
@@ -127,12 +161,16 @@ src/
 │   ├── login/        # Login page
 │   └── layout.tsx
 ├── components/
+│   ├── admin/                # Admin-specific components
+│   │   ├── AdminNav.tsx                   # Admin navigation bar
+│   │   └── AdminFoodProductsManager.tsx   # Admin food products CRUD
 │   ├── FamilySetup.tsx       # Create/join family flow with role selection
 │   ├── FamilyDashboard.tsx   # Family overview with admin controls
+│   ├── FamilySettings.tsx    # Family settings (family admin only)
 │   ├── PetForm.tsx           # Pet create/edit form with image upload
 │   ├── PetDetailTabs.tsx     # Pet detail page with tabs
 │   ├── PetWalks.tsx          # Walk records with date filtering
-│   ├── PetMeals.tsx          # Meal records with date filtering
+│   ├── PetMeals.tsx          # Meal records with calorie calculation
 │   ├── PetHealthRecords.tsx  # Daily health tracking (appetite, mood, activity, bathroom)
 │   ├── PetMedications.tsx    # Medication management with logs
 │   ├── PetTraits.tsx         # Pet traits management
@@ -142,7 +180,8 @@ src/
 │   ├── SharedPetView.tsx     # Public read-only pet view component
 │   └── DeletePetButton.tsx   # Admin-only pet deletion
 └── lib/
-    ├── permissions.ts    # Admin permission utilities
+    ├── admin.ts          # System admin utilities
+    ├── permissions.ts    # Family admin permission utilities
     ├── pdf/
     │   └── PetRecordDocument.tsx  # PDF document template
     └── supabase/
@@ -248,6 +287,26 @@ src/
 - `given_by`: UUID (foreign key to auth.users, nullable)
 - `notes`: Text (nullable)
 - `created_at`: Timestamp
+
+### pet_food_products
+- `id`: UUID (primary key)
+- `name`: Text
+- `brand`: Text (nullable)
+- `calories_per_100g`: Numeric (kcal per 100g)
+- `product_type`: Text (nullable, e.g., dry food, wet food, treats)
+- `species`: Text (nullable, e.g., dog, cat)
+- `notes`: Text (nullable)
+- `is_public`: Boolean (true for public products managed by system admins, false for private products)
+- `created_by`: UUID (foreign key to auth.users, nullable - null for system admin created products)
+- `created_at`: Timestamp
+- `updated_at`: Timestamp
+- **Note**: Only system administrators can create/edit/delete products. All users can use public products for calorie calculation.
+
+### admin_users
+- `id`: UUID (primary key)
+- `user_id`: UUID (foreign key to auth.users, unique)
+- `created_at`: Timestamp
+- `created_by`: UUID (foreign key to auth.users, nullable)
 
 ### share_tokens
 - `id`: UUID (primary key)
