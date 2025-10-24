@@ -12,6 +12,7 @@ import PetTraits from '@/components/PetTraits'
 import PetMeta from '@/components/PetMeta'
 import PetHealthRecords from '@/components/PetHealthRecords'
 import PetMedications from '@/components/PetMedications'
+import AdBanner from '@/components/AdBanner'
 
 interface Pet {
   id: string
@@ -24,14 +25,26 @@ interface Pet {
   notes?: string
 }
 
+interface Banner {
+  id: string
+  title: string
+  description: string | null
+  image_url: string | null
+  link_url: string
+  background_color: string
+  text_color: string
+}
+
 type Tab = 'details' | 'walks' | 'meals' | 'health' | 'medications' | 'traits' | 'meta'
 
 export default function PetDetailTabs({
   pet,
   isAdmin,
+  banners = [],
 }: {
   pet: Pet
   isAdmin: boolean
+  banners?: Banner[]
 }) {
   const [activeTab, setActiveTab] = useState<Tab>('details')
 
@@ -245,6 +258,25 @@ export default function PetDetailTabs({
             </Link>
           </div>
         </div>
+
+        {/* Advertisement Banners */}
+        {banners.length > 0 && (
+          <div className="space-y-6 mt-6">
+            {banners.map((banner) => (
+              <AdBanner
+                key={banner.id}
+                id={banner.id}
+                title={banner.title}
+                description={banner.description}
+                imageUrl={banner.image_url}
+                linkUrl={banner.link_url}
+                backgroundColor={banner.background_color}
+                textColor={banner.text_color}
+                position="bottom"
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

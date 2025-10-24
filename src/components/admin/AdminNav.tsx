@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { ShieldCheck, Package, LayoutDashboard, LogOut } from 'lucide-react'
+import { ShieldCheck, Package, LayoutDashboard, LogOut, Frame } from 'lucide-react'
 
 interface User {
   id: string
@@ -24,6 +24,7 @@ export default function AdminNav({ user }: { user: User }) {
   const navItems = [
     { href: '/admin', label: 'ダッシュボード', icon: LayoutDashboard },
     { href: '/admin/food-products', label: 'フード製品', icon: Package },
+    { href: '/admin/banners', label: 'バナー広告', icon: Frame },
   ]
 
   return (

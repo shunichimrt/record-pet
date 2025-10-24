@@ -36,5 +36,19 @@ export default async function PetDetailPage({
     redirect('/app/pets')
   }
 
-  return <PetDetailTabs pet={pet} isAdmin={membership.is_admin} />
+  // Fetch active banners for pet detail page
+  const { data: banners } = await supabase
+    .from('ad_banners')
+    .select('*')
+    .eq('is_active', true)
+    .in('display_position', ['pet_detail', 'both'])
+    .order('display_order', { ascending: true })
+
+  return (
+    <PetDetailTabs
+      pet={pet}
+      isAdmin={membership.is_admin}
+      banners={banners || []}
+    />
+  )
 }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Users, Key, PawPrint, Settings, LogOut, UserCircle2, Crown, Calendar } from 'lucide-react'
+import AdBanner from './AdBanner'
 
 interface Family {
   id: string
@@ -19,12 +20,24 @@ interface Member {
   joined_at: string
 }
 
+interface Banner {
+  id: string
+  title: string
+  description: string | null
+  image_url: string | null
+  link_url: string
+  background_color: string
+  text_color: string
+}
+
 export default function FamilyDashboard({
   familyId,
   userId,
+  banners = [],
 }: {
   familyId: string
   userId: string
+  banners?: Banner[]
 }) {
   const [family, setFamily] = useState<Family | null>(null)
   const [members, setMembers] = useState<Member[]>([])
@@ -270,6 +283,25 @@ export default function FamilyDashboard({
             </button>
           </div>
         </div>
+
+        {/* Advertisement Banners */}
+        {banners.length > 0 && (
+          <div className="space-y-6">
+            {banners.map((banner) => (
+              <AdBanner
+                key={banner.id}
+                id={banner.id}
+                title={banner.title}
+                description={banner.description}
+                imageUrl={banner.image_url}
+                linkUrl={banner.link_url}
+                backgroundColor={banner.background_color}
+                textColor={banner.text_color}
+                position="bottom"
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

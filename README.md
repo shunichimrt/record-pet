@@ -40,10 +40,11 @@ Run the SQL commands in the following order in your Supabase SQL Editor:
 10. `supabase/migration_fix_admin_rls.sql` - **IMPORTANT: Fixes admin RLS circular reference**
 11. `supabase/migration_system_admin_separation.sql` - **IMPORTANT: Separates system admins from regular users**
 12. `supabase/migration_admin_statistics.sql` - **IMPORTANT: Creates functions for system-wide statistics**
-13. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
-14. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
-15. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
-16. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
+13. `supabase/migration_ad_banners.sql` - Creates ad_banners table and Storage bucket for advertisement banners
+14. `supabase/migration_share_tokens.sql` - Creates share_tokens table for public sharing
+15. `supabase/migration_fix_share_tokens_rls.sql` - Fixes share token RLS policies (admin-only revocation)
+16. `supabase/migration_create_family_function.sql` - Creates function to create family with admin in one transaction
+17. `supabase/migration_fix_share_public_access.sql` - Allows public access to shared pet data
 
 ### 4. Set up system administrator (Optional - For Record-Pet Operators Only)
 
@@ -173,9 +174,17 @@ This application has **two completely separate types of administrators**:
   - **Completely separate from family administrators**
   - System-wide administration dashboard
   - **Create and manage public food products** available to all users
+  - **Create and manage advertisement banners** displayed on user pages
   - View system statistics (users, pets, products)
   - Only users in `admin_users` table can access
   - **Different from family admins**: Family admins manage their family at `/app/settings`, system admins manage the entire application at `/admin`
+- **Advertisement Banners**:
+  - System administrators can create and manage banners at `/admin/banners`
+  - Upload banner images to Supabase Storage
+  - Set display position (dashboard, pet detail, or both)
+  - Schedule with start/end dates
+  - Click tracking for analytics
+  - Displayed on dashboard and pet detail pages
 - **PDF Export**:
   - Generate comprehensive PDF reports of pet records
   - A4 portrait layout with professional styling
@@ -215,7 +224,8 @@ src/
 │   ├── admin/           # Admin panel (system administrators only)
 │   │   ├── layout.tsx              # Admin layout with navigation
 │   │   ├── page.tsx                # Admin dashboard
-│   │   └── food-products/page.tsx  # Food products management
+│   │   ├── food-products/page.tsx  # Food products management
+│   │   └── banners/page.tsx        # Advertisement banners management
 │   ├── api/
 │   │   └── pets/
 │   │       └── [id]/
@@ -238,7 +248,9 @@ src/
 ├── components/
 │   ├── admin/                # Admin-specific components
 │   │   ├── AdminNav.tsx                   # Admin navigation bar
-│   │   └── AdminFoodProductsManager.tsx   # Admin food products CRUD
+│   │   ├── AdminFoodProductsManager.tsx   # Admin food products CRUD
+│   │   └── AdminBannerManager.tsx         # Admin banners CRUD with image upload
+│   ├── AdBanner.tsx          # Advertisement banner display component with click tracking
 │   ├── FamilySetup.tsx       # Create/join family flow with role selection
 │   ├── FamilyDashboard.tsx   # Family overview with admin controls
 │   ├── FamilySettings.tsx    # Family settings (family admin only)
@@ -392,5 +404,24 @@ src/
 - `is_active`: Boolean
 - `created_at`: Timestamp
 
+### ad_banners
+- `id`: UUID (primary key)
+- `title`: Text
+- `description`: Text (nullable)
+- `image_url`: Text (nullable, Supabase Storage URL)
+- `link_url`: Text (click destination URL)
+- `is_active`: Boolean
+- `display_position`: Text ('dashboard', 'pet_detail', 'both')
+- `display_order`: Integer (display order)
+- `background_color`: Text (gradient class)
+- `text_color`: Text (text color class)
+- `start_date`: Timestamp (nullable)
+- `end_date`: Timestamp (nullable)
+- `click_count`: Integer (click tracking)
+- `created_by`: UUID (foreign key to auth.users, nullable)
+- `created_at`: Timestamp
+- `updated_at`: Timestamp
+
 ### Storage Buckets
 - `pet-avatars`: Public bucket for pet avatar images
+- `ad-banners`: Public bucket for advertisement banner images

@@ -25,5 +25,19 @@ export default async function AppPage() {
     return <FamilySetup userId={user.id} />
   }
 
-  return <FamilyDashboard familyId={familyMember.family_id} userId={user.id} />
+  // Fetch active banners for dashboard
+  const { data: banners } = await supabase
+    .from('ad_banners')
+    .select('*')
+    .eq('is_active', true)
+    .in('display_position', ['dashboard', 'both'])
+    .order('display_order', { ascending: true })
+
+  return (
+    <FamilyDashboard
+      familyId={familyMember.family_id}
+      userId={user.id}
+      banners={banners || []}
+    />
+  )
 }

@@ -226,7 +226,7 @@ export default function PetForm({
         />
         {uploading && (
           <p className="text-sm text-[#FF8E53] mt-2 flex items-center gap-2 animate-fade-in">
-            <div className="w-4 h-4 border-2 border-[#FF8E53] border-t-transparent rounded-full animate-spin" />
+            <span className="w-4 h-4 border-2 border-[#FF8E53] border-t-transparent rounded-full animate-spin inline-block" />
             画像をアップロード中...
           </p>
         )}
