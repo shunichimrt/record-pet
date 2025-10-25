@@ -37,8 +37,8 @@ export default function AdBanner({
     }
 
     // Track with analytics if available
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'ad_click', {
+    if (typeof window !== 'undefined' && 'gtag' in window && typeof (window as any).gtag === 'function') {
+      (window as any).gtag('event', 'ad_click', {
         ad_title: title,
         ad_url: linkUrl,
       })

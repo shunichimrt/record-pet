@@ -15,6 +15,7 @@ import {
   Calendar,
   ArrowUp,
   ArrowDown,
+  Frame,
 } from 'lucide-react'
 
 interface Banner {

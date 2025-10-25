@@ -247,7 +247,7 @@ export default function PetDetailTabs({
             )}
 
             {activeTab === 'walks' && <PetWalks petId={pet.id} />}
-            {activeTab === 'meals' && <PetMeals petId={pet.id} />}
+            {activeTab === 'meals' && <PetMeals petId={pet.id} petSpecies={pet.species} />}
             {activeTab === 'health' && <PetHealthRecords petId={pet.id} />}
             {activeTab === 'medications' && <PetMedications petId={pet.id} />}
             {activeTab === 'traits' && <PetTraits petId={pet.id} />}
