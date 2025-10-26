@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
-import { Package, Sparkles, Save, Edit, X, Loader2, Trash2, Search, Globe, Lock } from 'lucide-react'
+import { Package, Sparkles, Save, Edit, X, Loader2, Trash2, Search, Globe, Lock, Image as ImageIcon, Upload } from 'lucide-react'
 
 interface FoodProduct {
   id: string
@@ -14,6 +14,7 @@ interface FoodProduct {
   notes?: string
   is_public: boolean
   created_by?: string
+  image_url?: string
 }
 
 export default function AdminFoodProductsManager() {
@@ -33,6 +34,11 @@ export default function AdminFoodProductsManager() {
   const [species, setSpecies] = useState('dog')
   const [notes, setNotes] = useState('')
   const [isPublic, setIsPublic] = useState(true) // Admin defaults to public
+
+  // Image upload state
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   const supabase = createClient()
 
@@ -63,6 +69,44 @@ export default function AdminFoodProductsManager() {
     setLoading(false)
   }
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('meal-images')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        return null
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('meal-images')
+        .getPublicUrl(filePath)
+
+      return publicUrl
+    } catch (error) {
+      console.error('Image upload failed:', error)
+      return null
+    }
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   const resetForm = () => {
     setName('')
     setBrand('')
@@ -71,6 +115,8 @@ export default function AdminFoodProductsManager() {
     setSpecies('dog')
     setNotes('')
     setIsPublic(true)
+    setImageFile(null)
+    setImagePreview(null)
     setEditingId(null)
     setShowForm(false)
   }
@@ -84,30 +130,48 @@ export default function AdminFoodProductsManager() {
     setSpecies(product.species || 'dog')
     setNotes(product.notes || '')
     setIsPublic(product.is_public)
+    if (product.image_url) {
+      setImagePreview(product.image_url)
+    }
     setShowForm(true)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setUploading(true)
 
-    const productData = {
-      name,
-      brand: brand || null,
-      calories_per_100g: parseFloat(caloriesPer100g),
-      product_type: productType,
-      species,
-      notes: notes || null,
-      is_public: isPublic,
+    try {
+      // Upload image if provided
+      let imageUrl: string | null = null
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile)
+      } else if (imagePreview && !imageFile) {
+        // Keep existing image URL
+        imageUrl = imagePreview
+      }
+
+      const productData = {
+        name,
+        brand: brand || null,
+        calories_per_100g: parseFloat(caloriesPer100g),
+        product_type: productType,
+        species,
+        notes: notes || null,
+        is_public: isPublic,
+        image_url: imageUrl,
+      }
+
+      if (editingId) {
+        await supabase.from('pet_food_products').update(productData).eq('id', editingId)
+      } else {
+        await supabase.from('pet_food_products').insert(productData)
+      }
+
+      resetForm()
+      loadProducts()
+    } finally {
+      setUploading(false)
     }
-
-    if (editingId) {
-      await supabase.from('pet_food_products').update(productData).eq('id', editingId)
-    } else {
-      await supabase.from('pet_food_products').insert(productData)
-    }
-
-    resetForm()
-    loadProducts()
   }
 
   const handleDelete = async (id: string) => {
@@ -308,6 +372,38 @@ export default function AdminFoodProductsManager() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              製品画像（任意）
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            />
+            {imagePreview && (
+              <div className="mt-3 relative">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full max-h-48 object-cover rounded-xl border-2 border-gray-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImageFile(null)
+                    setImagePreview(null)
+                  }}
+                  className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="flex gap-3 pt-2">
             <button
               type="submit"
@@ -376,6 +472,15 @@ export default function AdminFoodProductsManager() {
                       </span>
                     )}
                   </div>
+                  {product.image_url && (
+                    <div className="mt-3">
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full max-h-48 object-cover rounded-xl border-2 border-gray-200"
+                      />
+                    </div>
+                  )}
                   {product.notes && (
                     <p className="text-sm text-gray-700 mt-2 p-3 bg-gray-50 rounded-xl leading-relaxed">
                       {product.notes}

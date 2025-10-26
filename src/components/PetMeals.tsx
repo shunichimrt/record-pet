@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
-import { Calendar, CalendarDays, UtensilsCrossed, Clock, Scale, StickyNote, Sparkles, Save, Edit, X, Loader2, Flame, Package, Users, Heart, Search, Tag, TrendingUp, BookmarkPlus } from 'lucide-react'
+import { Calendar, CalendarDays, UtensilsCrossed, Clock, Scale, StickyNote, Sparkles, Save, Edit, X, Loader2, Flame, Package, Users, Heart, Search, Tag, TrendingUp, BookmarkPlus, Image as ImageIcon, Upload } from 'lucide-react'
 
 interface Meal {
   id: string
@@ -13,11 +13,13 @@ interface Meal {
   amount_grams?: number
   calories?: number
   notes?: string
+  image_url?: string
   pet_food_products?: {
     id: string
     name: string
     brand?: string
     calories_per_100g: number
+    image_url?: string
   }
 }
 
@@ -27,6 +29,7 @@ interface FoodProduct {
   brand?: string
   calories_per_100g: number
   product_type?: string
+  image_url?: string
 }
 
 interface MealTemplate {
@@ -46,6 +49,7 @@ interface MealTemplate {
   tags: string[]
   created_at: string
   is_liked?: boolean
+  image_url?: string
 }
 
 type InputMode = 'manual' | 'product' | 'template'
@@ -76,6 +80,13 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
   const [templateName, setTemplateName] = useState('')
   const [templateDescription, setTemplateDescription] = useState('')
   const [templateTags, setTemplateTags] = useState('')
+
+  // Image upload state
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [templateImageFile, setTemplateImageFile] = useState<File | null>(null)
+  const [templateImagePreview, setTemplateImagePreview] = useState<string | null>(null)
 
   // Filter state
   const [startDate, setStartDate] = useState('')
@@ -184,6 +195,60 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
     setTemplateName('')
     setTemplateDescription('')
     setTemplateTags('')
+    setImageFile(null)
+    setImagePreview(null)
+    setTemplateImageFile(null)
+    setTemplateImagePreview(null)
+  }
+
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('meal-images')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        return null
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('meal-images')
+        .getPublicUrl(filePath)
+
+      return publicUrl
+    } catch (error) {
+      console.error('Image upload failed:', error)
+      return null
+    }
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleTemplateImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setTemplateImageFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setTemplateImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const handleEdit = (meal: Meal) => {
@@ -202,6 +267,9 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
     }
 
     setNotes(meal.notes || '')
+    if (meal.image_url) {
+      setImagePreview(meal.image_url)
+    }
     setShowForm(true)
   }
 
@@ -213,74 +281,91 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setUploading(true)
 
-    let mealData: any = {
-      pet_id: petId,
-      fed_at: fedAt,
-      notes: notes || null,
-    }
+    try {
+      // Upload image if provided
+      let imageUrl: string | null = null
 
-    if (inputMode === 'template' && selectedTemplate) {
-      // Using a template - use the first item from template
-      const firstItem = selectedTemplate.food_items[0]
-      if (firstItem) {
-        if (firstItem.food_product_id) {
-          // Template item is a product
-          mealData = {
-            ...mealData,
-            food_product_id: firstItem.food_product_id,
-            amount_grams: firstItem.amount_grams,
-            calories: firstItem.calories,
-            food_type: null,
-            amount: null,
-          }
-        } else {
-          // Template item is manual entry
-          mealData = {
-            ...mealData,
-            food_type: firstItem.food_name,
-            amount: `${firstItem.amount_grams}g`,
-            calories: firstItem.calories,
-            food_product_id: null,
-            amount_grams: null,
+      if (inputMode === 'template' && selectedTemplate) {
+        // Use template's image
+        imageUrl = selectedTemplate.image_url || null
+      } else if (imageFile) {
+        // Upload new image for manual or product mode
+        imageUrl = await uploadImage(imageFile)
+      }
+
+      let mealData: any = {
+        pet_id: petId,
+        fed_at: fedAt,
+        notes: notes || null,
+        image_url: imageUrl,
+      }
+
+      if (inputMode === 'template' && selectedTemplate) {
+        // Using a template - use the first item from template
+        const firstItem = selectedTemplate.food_items[0]
+        if (firstItem) {
+          if (firstItem.food_product_id) {
+            // Template item is a product
+            mealData = {
+              ...mealData,
+              food_product_id: firstItem.food_product_id,
+              amount_grams: firstItem.amount_grams,
+              calories: firstItem.calories,
+              food_type: null,
+              amount: null,
+            }
+          } else {
+            // Template item is manual entry
+            mealData = {
+              ...mealData,
+              food_type: firstItem.food_name,
+              amount: `${firstItem.amount_grams}g`,
+              calories: firstItem.calories,
+              food_product_id: null,
+              amount_grams: null,
+            }
           }
         }
+      } else if (inputMode === 'product' && foodProductId) {
+        // Using a food product
+        mealData = {
+          ...mealData,
+          food_product_id: foodProductId,
+          amount_grams: amountGrams ? parseFloat(amountGrams) : null,
+          calories: calculatedCalories,
+          food_type: null,
+          amount: null,
+        }
+      } else if (inputMode === 'manual') {
+        // Manual entry
+        mealData = {
+          ...mealData,
+          food_type: foodType || null,
+          amount: amount || null,
+          calories: manualCalories ? parseFloat(manualCalories) : null,
+          food_product_id: null,
+          amount_grams: null,
+        }
       }
-    } else if (inputMode === 'product' && foodProductId) {
-      // Using a food product
-      mealData = {
-        ...mealData,
-        food_product_id: foodProductId,
-        amount_grams: amountGrams ? parseFloat(amountGrams) : null,
-        calories: calculatedCalories,
-        food_type: null,
-        amount: null,
-      }
-    } else if (inputMode === 'manual') {
-      // Manual entry
-      mealData = {
-        ...mealData,
-        food_type: foodType || null,
-        amount: amount || null,
-        calories: manualCalories ? parseFloat(manualCalories) : null,
-        food_product_id: null,
-        amount_grams: null,
-      }
-    }
 
-    if (editingId) {
-      await supabase.from('pet_meals').update(mealData).eq('id', editingId)
-    } else {
-      await supabase.from('pet_meals').insert(mealData)
-      // Increment template use count if used
-      if (selectedTemplate) {
-        await supabase.rpc('increment_template_use_count', { template_id: selectedTemplate.id })
+      if (editingId) {
+        await supabase.from('pet_meals').update(mealData).eq('id', editingId)
+      } else {
+        await supabase.from('pet_meals').insert(mealData)
+        // Increment template use count if used
+        if (selectedTemplate) {
+          await supabase.rpc('increment_template_use_count', { template_id: selectedTemplate.id })
+        }
       }
-    }
 
-    resetForm()
-    loadMeals()
-    loadTemplates()
+      resetForm()
+      loadMeals()
+      loadTemplates()
+    } finally {
+      setUploading(false)
+    }
   }
 
   const handleDelete = async (id: string) => {
@@ -298,61 +383,76 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    let foodItems: any[] = []
-    let totalCalories = 0
+    setUploading(true)
 
-    if (inputMode === 'product' && foodProductId) {
-      const product = foodProducts.find(p => p.id === foodProductId)
-      if (product && amountGrams) {
-        const grams = parseFloat(amountGrams)
-        const calories = (product.calories_per_100g * grams) / 100
-        foodItems = [{
-          food_product_id: foodProductId,
-          food_name: product.name,
-          amount_grams: grams,
-          calories: Math.round(calories * 10) / 10
-        }]
-        totalCalories = Math.round(calories * 10) / 10
+    try {
+      // Upload template image if provided
+      let templateImageUrl: string | null = null
+      if (templateImageFile) {
+        templateImageUrl = await uploadImage(templateImageFile)
       }
-    } else if (inputMode === 'manual') {
-      if (foodType && amount) {
-        const calories = manualCalories ? parseFloat(manualCalories) : 0
-        foodItems = [{
-          food_name: foodType,
-          amount_grams: parseFloat(amount.replace(/[^\d.]/g, '')) || 0,
-          calories: calories
-        }]
-        totalCalories = calories
+
+      let foodItems: any[] = []
+      let totalCalories = 0
+
+      if (inputMode === 'product' && foodProductId) {
+        const product = foodProducts.find(p => p.id === foodProductId)
+        if (product && amountGrams) {
+          const grams = parseFloat(amountGrams)
+          const calories = (product.calories_per_100g * grams) / 100
+          foodItems = [{
+            food_product_id: foodProductId,
+            food_name: product.name,
+            amount_grams: grams,
+            calories: Math.round(calories * 10) / 10
+          }]
+          totalCalories = Math.round(calories * 10) / 10
+        }
+      } else if (inputMode === 'manual') {
+        if (foodType && amount) {
+          const calories = manualCalories ? parseFloat(manualCalories) : 0
+          foodItems = [{
+            food_name: foodType,
+            amount_grams: parseFloat(amount.replace(/[^\d.]/g, '')) || 0,
+            calories: calories
+          }]
+          totalCalories = calories
+        }
       }
-    }
 
-    if (foodItems.length === 0) {
-      alert('保存する食事データを入力してください')
-      return
-    }
+      if (foodItems.length === 0) {
+        alert('保存する食事データを入力してください')
+        return
+      }
 
-    const tags = templateTags.split(',').map(t => t.trim()).filter(t => t.length > 0)
+      const tags = templateTags.split(',').map(t => t.trim()).filter(t => t.length > 0)
 
-    const { error } = await supabase.from('shared_meal_templates').insert({
-      name: templateName,
-      description: templateDescription || null,
-      species: petSpecies,
-      food_items: foodItems,
-      total_calories: totalCalories,
-      tags: tags,
-      created_by: user.id
-    })
+      const { error } = await supabase.from('shared_meal_templates').insert({
+        name: templateName,
+        description: templateDescription || null,
+        species: petSpecies,
+        food_items: foodItems,
+        total_calories: totalCalories,
+        tags: tags,
+        image_url: templateImageUrl,
+        created_by: user.id
+      })
 
-    if (error) {
-      alert('テンプレートの保存に失敗しました')
-      console.error(error)
-    } else {
-      alert('テンプレートを保存しました！')
-      setShowSaveTemplate(false)
-      setTemplateName('')
-      setTemplateDescription('')
-      setTemplateTags('')
-      loadTemplates()
+      if (error) {
+        alert('テンプレートの保存に失敗しました')
+        console.error(error)
+      } else {
+        alert('テンプレートを保存しました！')
+        setShowSaveTemplate(false)
+        setTemplateName('')
+        setTemplateDescription('')
+        setTemplateTags('')
+        setTemplateImageFile(null)
+        setTemplateImagePreview(null)
+        loadTemplates()
+      }
+    } finally {
+      setUploading(false)
     }
   }
 
@@ -474,6 +574,34 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
                 placeholder="タグ（カンマ区切り。例: 朝食,バランス）"
                 className="w-full px-4 py-2 border border-purple-200 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
               />
+              <div>
+                <label className="block text-sm font-semibold text-purple-900 mb-2">写真（任意）</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleTemplateImageChange}
+                  className="w-full px-4 py-2 border border-purple-200 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                />
+                {templateImagePreview && (
+                  <div className="mt-2 relative">
+                    <img
+                      src={templateImagePreview}
+                      alt="Template preview"
+                      className="w-full max-h-32 object-cover rounded-lg border-2 border-purple-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTemplateImageFile(null)
+                        setTemplateImagePreview(null)
+                      }}
+                      className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-all"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="flex gap-2">
                 <button
                   type="button"
@@ -599,6 +727,15 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
                             <Heart className={`w-5 h-5 ${template.is_liked ? 'fill-current' : ''}`} />
                           </button>
                         </div>
+                        {template.image_url && (
+                          <div className="mb-2">
+                            <img
+                              src={template.image_url}
+                              alt={template.name}
+                              className="w-full max-h-32 object-cover rounded-lg border border-gray-200"
+                            />
+                          </div>
+                        )}
                         {template.description && (
                           <p className="text-sm text-gray-600 mb-2">{template.description}</p>
                         )}
@@ -757,6 +894,59 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
               </>
             )}
 
+            {/* Image upload - only for manual and product modes */}
+            {inputMode !== 'template' && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" />
+                  写真（任意）
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FF8E53] focus:border-transparent transition-all"
+                />
+                {imagePreview && (
+                  <div className="mt-3 relative">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full max-h-48 object-cover rounded-xl border-2 border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageFile(null)
+                        setImagePreview(null)
+                      }}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-all"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Template image preview - only for template mode */}
+            {inputMode === 'template' && selectedTemplate?.image_url && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4" />
+                  テンプレートの写真
+                </label>
+                <img
+                  src={selectedTemplate.image_url}
+                  alt={selectedTemplate.name}
+                  className="w-full max-h-48 object-cover rounded-xl border-2 border-gray-200"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  ※ テンプレートから登録する場合、この写真が使用されます
+                </p>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                 <StickyNote className="w-4 h-4" />
@@ -854,6 +1044,15 @@ export default function PetMeals({ petId, petSpecies }: { petId: string; petSpec
                       </span>
                     )}
                   </div>
+                  {meal.image_url && (
+                    <div className="mt-3">
+                      <img
+                        src={meal.image_url}
+                        alt="食事の写真"
+                        className="w-full max-h-64 object-cover rounded-xl border-2 border-gray-200"
+                      />
+                    </div>
+                  )}
                   {meal.notes && (
                     <p className="text-sm text-gray-700 mt-3 p-3 bg-gray-50 rounded-xl leading-relaxed">
                       {meal.notes}
